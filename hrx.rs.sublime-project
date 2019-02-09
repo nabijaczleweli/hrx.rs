@@ -27,8 +27,8 @@
 		},
 		{
 			"follow_symlinks": true,
-			"name": "Examples",
-			"path": "examples"
+			"name": "Tests",
+			"path": "tests"
 		},
 		{
 			"file_include_patterns":

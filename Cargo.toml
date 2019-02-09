@@ -4,11 +4,13 @@ description = "Rust implementation of the HRX plain text archive format"
 repository = "https://github.com/nabijaczleweli/hrx.rs"
 documentation = "https://rawcdn.githack.com/nabijaczleweli/hrx.rs/doc/hrx/index.html"
 readme = "README.md"
-keywords = ["archive"]
-categories = ["external-ffi-bindings"]
+keywords = ["archive", "plaintext"]
+categories = ["command-line-utilities", "encoding"]
 license = "MIT"
 # Remember to also update in appveyor.yml
 version = "0.1.0"
 authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
 
-[dependencies]
+[build-dependencies]
+rustfmt = "0.10"
+peg = "0.5"
