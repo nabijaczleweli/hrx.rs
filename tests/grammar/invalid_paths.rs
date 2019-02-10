@@ -6,7 +6,7 @@ use hrx::grammar::{ParseError, path};
 
 #[test]
 fn initial_slash() {
-    assert_eq!(path("/file"),
+    assert_eq!(path("/file", 0),
                Err(ParseError {
                    line: 1,
                    column: 1,
@@ -19,7 +19,7 @@ fn initial_slash() {
 
 #[test]
 fn double_slash() {
-    assert_eq!(path("dir//file"),
+    assert_eq!(path("dir//file", 0),
                Err(ParseError {
                    line: 1,
                    column: 5,
@@ -32,7 +32,7 @@ fn double_slash() {
 
 #[test]
 fn final_slash() {
-    assert_eq!(path("dir//"),
+    assert_eq!(path("dir//", 0),
                Err(ParseError {
                    line: 1,
                    column: 5,
@@ -45,7 +45,7 @@ fn final_slash() {
 
 #[test]
 fn single_dot() {
-    assert_eq!(path("."),
+    assert_eq!(path(".", 0),
                Err(ParseError {
                    line: 1,
                    column: 2,
@@ -59,7 +59,7 @@ fn single_dot() {
 
 #[test]
 fn double_dot() {
-    assert_eq!(path(".."),
+    assert_eq!(path("..", 0),
                Err(ParseError {
                    line: 1,
                    column: 3,
@@ -73,7 +73,7 @@ fn double_dot() {
 
 #[test]
 fn single_dot_component() {
-    assert_eq!(path("dir/./file"),
+    assert_eq!(path("dir/./file", 0),
                Err(ParseError {
                    line: 1,
                    column: 6,
@@ -87,7 +87,7 @@ fn single_dot_component() {
 
 #[test]
 fn double_dot_component() {
-    assert_eq!(path("dir/../file"),
+    assert_eq!(path("dir/../file", 0),
                Err(ParseError {
                    line: 1,
                    column: 7,
@@ -101,7 +101,7 @@ fn double_dot_component() {
 
 #[test]
 fn backslash() {
-    assert_eq!(path("dir\\file"),
+    assert_eq!(path("dir\\file", 0),
                Err(ParseError {
                    line: 1,
                    column: 4,
@@ -115,7 +115,7 @@ fn backslash() {
 
 #[test]
 fn invalid_ascii() {
-    assert_eq!(path("\x7F"),
+    assert_eq!(path("\x7F", 0),
                Err(ParseError {
                    line: 1,
                    column: 1,
@@ -128,7 +128,7 @@ fn invalid_ascii() {
 
 #[test]
 fn colon() {
-    assert_eq!(path("C:/file"),
+    assert_eq!(path("C:/file", 0),
                Err(ParseError {
                    line: 1,
                    column: 2,
