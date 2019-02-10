@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["path",""]],"struct":[["ParseError","HRX parsing error"]],"type":[["ParseResult",""]]});
+initSidebarItems({"fn":[["archive",""],["body",""],["comment",""],["directory",""],["entry",""],["file",""],["path",""]],"struct":[["ParseError","HRX parsing error"]],"type":[["ParseResult",""]]});
