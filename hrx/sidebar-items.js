@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["grammar",""]]});
+initSidebarItems({"enum":[["HrxEntryData",""]],"mod":[["grammar",""]],"struct":[["HrxArchive",""],["HrxEntry",""]]});
