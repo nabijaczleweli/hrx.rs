@@ -11,6 +11,10 @@ license = "MIT"
 version = "0.1.0"
 authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
 
+
+[dependencies]
+linked-hash-map = "0.5"
+
 [build-dependencies]
 rustfmt = "0.10"
 peg = "0.5"
