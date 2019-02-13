@@ -8,4 +8,6 @@ sourcesIndex['hrx'] = {"name":"","dirs":[],"files":["grammar.rs","lib.rs"]};
 sourcesIndex['hrx'] = {"name":"","dirs":[],"files":["grammar.rs","lib.rs"]};
 sourcesIndex['hrx'] = {"name":"","dirs":[],"files":["grammar.rs","lib.rs"]};
 sourcesIndex['hrx'] = {"name":"","dirs":[],"files":["grammar.rs","lib.rs"]};
+sourcesIndex['hrx'] = {"name":"","dirs":[{"name":"grammar","dirs":[],"files":["individual.rs","main.rs","mod.rs"]}],"files":["lib.rs","repr.rs"]};
+sourcesIndex['jetscii'] = {"name":"","dirs":[],"files":["fallback.rs","lib.rs","simd.rs"]};
 sourcesIndex['linked_hash_map'] = {"name":"","dirs":[],"files":["lib.rs"]};
