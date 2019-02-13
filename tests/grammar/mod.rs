@@ -1,1 +1,1 @@
-mod invalid_paths;
+mod main;
