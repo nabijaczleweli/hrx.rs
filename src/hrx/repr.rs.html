@@ -18,27 +18,25 @@
 <span id="18">18</span>
 <span id="19">19</span>
 <span id="20">20</span>
-<span id="21">21</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">linked_hash_map</span>::<span class="ident">LinkedHashMap</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
 
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HrxArchive</span><span class="op">&lt;</span><span class="lifetime">&#39;dt</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;dt</span>, <span class="ident">str</span><span class="op">&gt;&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">entries</span>: <span class="ident">LinkedHashMap</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;dt</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">HrxEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;dt</span><span class="op">&gt;&gt;</span>,
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HrxArchive</span> {
+    <span class="kw">pub</span> <span class="ident">comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">entries</span>: <span class="ident">LinkedHashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">HrxEntry</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HrxEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;dt</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;dt</span>, <span class="ident">str</span><span class="op">&gt;&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">HrxEntryData</span><span class="op">&lt;</span><span class="lifetime">&#39;dt</span><span class="op">&gt;</span>,
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HrxEntry</span> {
+    <span class="kw">pub</span> <span class="ident">comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">HrxEntryData</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HrxEntryData</span><span class="op">&lt;</span><span class="lifetime">&#39;dt</span><span class="op">&gt;</span> {
-    <span class="ident">File</span> { <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;dt</span>, <span class="ident">str</span><span class="op">&gt;&gt;</span>, },
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HrxEntryData</span> {
+    <span class="ident">File</span> { <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, },
     <span class="ident">Directory</span>,
 }
 </pre></div>
