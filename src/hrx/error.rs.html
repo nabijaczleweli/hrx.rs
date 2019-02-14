@@ -76,9 +76,11 @@
 <span id="76">76</span>
 <span id="77">77</span>
 <span id="78">78</span>
+<span id="79">79</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">grammar</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span>;
+<span class="kw">use</span> <span class="ident">lazysort</span>::<span class="ident">Sorted</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 
 
@@ -100,7 +102,7 @@
 <span class="doccomment">///     offset: 6,</span>
 <span class="doccomment">///     expected: vec![&quot; &quot;, &quot;\n&quot;].into_iter().collect(),</span>
 <span class="doccomment">/// }));</span>
-<span class="doccomment">/// assert_eq!(err.to_string(), r#&quot;Parse failed at 1:7 [position 6]: expected &quot; &quot;, or &quot;\n&quot;.&quot;#);</span>
+<span class="doccomment">/// assert_eq!(err.to_string(), r#&quot;Parse failed at 1:7 [position 6]: expected &quot;\n&quot;, or &quot; &quot;.&quot;#);</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HrxError</span> {
@@ -123,7 +125,7 @@
             <span class="kw-2">&amp;</span><span class="ident">HrxError</span>::<span class="ident">Parse</span>(<span class="kw-2">ref</span> <span class="ident">pe</span>) <span class="op">=&gt;</span> {
                 <span class="macro">write</span><span class="macro">!</span>(<span class="ident">fmt</span>, <span class="string">&quot;Parse failed at {}:{} [position {}]: expected &quot;</span>, <span class="ident">pe</span>.<span class="ident">line</span>, <span class="ident">pe</span>.<span class="ident">column</span>, <span class="ident">pe</span>.<span class="ident">offset</span>)<span class="question-mark">?</span>;
 
-                <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">x</span>) <span class="kw">in</span> <span class="ident">pe</span>.<span class="ident">expected</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
+                <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">x</span>) <span class="kw">in</span> <span class="ident">pe</span>.<span class="ident">expected</span>.<span class="ident">iter</span>().<span class="ident">sorted</span>().<span class="ident">enumerate</span>() {
                     <span class="kw">if</span> <span class="ident">i</span> <span class="op">!=</span> <span class="number">0</span> {
                         <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
 
