@@ -14,6 +14,7 @@ authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
 
 [dependencies]
 linked-hash-map = "0.5"
+lazysort = "0.2"
 jetscii = "0.4"
 
 [build-dependencies]

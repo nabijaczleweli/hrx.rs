@@ -1,5 +1,6 @@
 use self::super::grammar;
 use std::error::Error;
+use lazysort::Sorted;
 use std::fmt;
 
 
@@ -21,7 +22,7 @@ use std::fmt;
 ///     offset: 6,
 ///     expected: vec![" ", "\n"].into_iter().collect(),
 /// }));
-/// assert_eq!(err.to_string(), r#"Parse failed at 1:7 [position 6]: expected " ", or "\n"."#);
+/// assert_eq!(err.to_string(), r#"Parse failed at 1:7 [position 6]: expected "\n", or " "."#);
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum HrxError {
@@ -44,7 +45,7 @@ impl fmt::Display for HrxError {
             &HrxError::Parse(ref pe) => {
                 write!(fmt, "Parse failed at {}:{} [position {}]: expected ", pe.line, pe.column, pe.offset)?;
 
-                for (i, x) in pe.expected.iter().enumerate() {
+                for (i, x) in pe.expected.iter().sorted().enumerate() {
                     if i != 0 {
                         fmt.write_str(", ")?;
 
