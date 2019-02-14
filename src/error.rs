@@ -24,7 +24,6 @@ use std::fmt;
 /// assert_eq!(err.to_string(), r#"Parse failed at 1:7 [position 6]: expected " ", or "\n"."#);
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
-// #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum HrxError {
     /// No valid HRX boundary found
     NoBoundary,

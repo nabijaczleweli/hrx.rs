@@ -21,7 +21,7 @@ fn main() {
     };
 
 
-    let grammar_rs = PathBuf::from(format!("{}/grammar.rs", out_dir));
+    let grammar_rs = PathBuf::from(format!("{}/main.rs", out_dir));
     peg::cargo_build("src/grammar/main.rustpeg");
     let _ = rustfmt::run(rustfmt::Input::File(grammar_rs.clone()),
                          &rustfmt::config::Config::from_toml_path(Path::new("rustfmt.toml")).expect("constructing rustfmt::Config from rustfmt.toml"));
