@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["HrxEntryData",""]],"mod":[["grammar",""]],"struct":[["HrxArchive",""],["HrxEntry",""]]});
+initSidebarItems({"enum":[["HrxEntryData",""],["HrxError","Generic error type, encompassing more precise errors."]],"mod":[["grammar",""]],"struct":[["HrxArchive",""],["HrxEntry",""]]});

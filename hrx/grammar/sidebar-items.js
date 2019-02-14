@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["archive",""],["body",""],["comment",""],["directory",""],["discover_first_boundary_length","Search the specified for the length of the first `boundary`"],["entry",""],["file",""],["path",""]],"struct":[["ParseError",""]],"type":[["ParseResult",""]]});
+initSidebarItems({"fn":[["archive",""],["body",""],["comment",""],["directory",""],["discover_first_boundary_length","Search the specified for the length of the first `boundary`"],["entry",""],["file",""],["path",""]],"struct":[["ParseError","HRX parsing error"]],"type":[["ParseResult",""]]});
