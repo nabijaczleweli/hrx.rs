@@ -1,14 +1,17 @@
+use jetscii::Substring as SubstringSearcher;
 use self::super::{grammar, HrxError};
 use linked_hash_map::LinkedHashMap;
 use std::borrow::Borrow;
 use std::str::FromStr;
-use std::fmt;
+use std::{iter, fmt};
 
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct HrxArchive {
     pub comment: Option<String>,
     pub entries: LinkedHashMap<HrxPath, HrxEntry>,
+
+    pub(crate) boundary_length: usize,
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
@@ -26,6 +29,40 @@ pub enum HrxEntryData {
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct HrxPath(pub(crate) String);
 
+
+impl HrxArchive {
+    pub fn boundary_length(&self) -> usize {
+        self.boundary_length
+    }
+
+    pub fn set_boundary_length(&mut self, new_len: usize) -> Result<(), ()> {
+        let bound: String = "\n<".chars().chain(iter::repeat('=').take(new_len)).chain(">".chars()).collect();
+        let ss = SubstringSearcher::new(&bound);
+
+        verify_opt(&self.comment, &ss)?;
+        for (_, dt) in &self.entries {
+            verify_opt(&dt.comment, &ss)?;
+            match dt.data {
+                HrxEntryData::File { ref body } => verify_opt(&body, &ss)?,
+                HrxEntryData::Directory => {}
+            }
+        }
+
+        self.boundary_length = new_len;
+
+        Ok(())
+    }
+}
+
+fn verify_opt(which: &Option<String>, with: &SubstringSearcher) -> Result<(), ()> {
+    if let Some(dt) = which.as_ref() {
+        if with.find(dt).is_some() {
+            return Err(());
+        }
+    }
+
+    Ok(())
+}
 
 impl FromStr for HrxArchive {
     type Err = HrxError;
