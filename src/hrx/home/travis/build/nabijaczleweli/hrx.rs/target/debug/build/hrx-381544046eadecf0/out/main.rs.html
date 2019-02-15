@@ -820,6 +820,7 @@
 <span id="820">820</span>
 <span id="821">821</span>
 <span id="822">822</span>
+<span id="823">823</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="ident">RuleResult</span>::{<span class="ident">Matched</span>, <span class="ident">Failed</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::{<span class="ident">HrxEntryData</span>, <span class="ident">HrxArchive</span>, <span class="ident">HrxEntry</span>, <span class="ident">HrxPath</span>};
@@ -967,6 +968,7 @@
                             <span class="ident">HrxArchive</span> {
                                 <span class="ident">comment</span>: <span class="ident">c</span>.<span class="ident">map</span>(<span class="ident">str</span>::<span class="ident">to_string</span>),
                                 <span class="ident">entries</span>: <span class="ident">ee</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">p</span>, <span class="ident">e</span>)<span class="op">|</span> (<span class="ident">p</span>, <span class="ident">e</span>)).<span class="ident">collect</span>(),
+                                <span class="ident">boundary_length</span>: <span class="ident">boundary_length</span>,
                             }
                         })
                     }
