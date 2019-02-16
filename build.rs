@@ -21,6 +21,22 @@ fn main() {
     };
 
 
+    let mut doc_buf = vec![];
+    let mut doc_map = vec![];
+    for line in BufReader::new(File::open("src/grammar/main.rustpeg").expect("Opening grammar source")).lines() {
+        let line = line.expect("Reading line of grammar source");
+
+        if line.starts_with("///") {
+            doc_buf.push(line);
+        } else if line.starts_with("pub ") {
+            doc_map.push((format!("pub fn {}", &line[4..4 + line[4..].find(" ").unwrap_or(line.len())]), doc_buf));
+            doc_buf = vec![];
+        } else if !doc_buf.is_empty() {
+            doc_map.push((format!("fn __parse_{}", &line[0..line.find(" ").unwrap_or(line.len())]), doc_buf));
+            doc_buf = vec![];
+        }
+    }
+
     let grammar_rs = PathBuf::from(format!("{}/main.rs", out_dir));
     peg::cargo_build("src/grammar/main.rustpeg");
     let _ = rustfmt::run(rustfmt::Input::File(grammar_rs.clone()),
@@ -30,9 +46,18 @@ fn main() {
     let mut out_f = File::create(&grammar_rs).expect("Creating documented grammar.rs");
     for line in BufReader::new(File::open(grammar_rs.with_extension("rs.nodoc")).expect("Opening formatted grammar.rs")).lines() {
         let line = line.expect("Reading line of formatted grammar.rs");
+
         if let Some(doc) = doc_correction_map.get(&line[..]) {
-            writeln!(out_f, "#[doc = \"{}\"] ", doc).expect("Adding documentation to documented grammar.rs");
+            writeln!(out_f, "/// {} ", doc).expect("Adding boilerplate documentation to documented grammar.rs");
         }
+
+        if let Some((_, doc)) = doc_map.iter().find(|doc| line.starts_with(&doc.0)) {
+            for doc_line in doc {
+                out_f.write_all(doc_line.as_bytes()).expect("Adding parse function documentation to documented grammar.rs");
+                out_f.write_all(b"\n").expect("Writing newline to documented grammar.rs");
+            }
+        }
+
         out_f.write_all(line.as_bytes()).expect("Copying line to documented grammar.rs");
         out_f.write_all(b"\n").expect("Writing newline to documented grammar.rs");
     }
