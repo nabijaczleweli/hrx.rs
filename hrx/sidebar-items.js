@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["HrxEntryData",""],["HrxError","Generic error type, encompassing more precise errors."]],"mod":[["grammar",""]],"struct":[["HrxArchive",""],["HrxEntry",""],["HrxPath",""]]});
+initSidebarItems({"enum":[["ErroneousBodyPath","A path to a `body` containing an invalid sequence"],["HrxEntryData",""],["HrxError","Generic error type, encompassing more precise errors."]],"mod":[["grammar",""]],"struct":[["HrxArchive",""],["HrxEntry",""],["HrxPath",""]]});
