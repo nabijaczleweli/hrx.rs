@@ -821,6 +821,28 @@
 <span id="821">821</span>
 <span id="822">822</span>
 <span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="ident">RuleResult</span>::{<span class="ident">Matched</span>, <span class="ident">Failed</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::{<span class="ident">HrxEntryData</span>, <span class="ident">HrxArchive</span>, <span class="ident">HrxEntry</span>, <span class="ident">HrxPath</span>};
@@ -838,15 +860,15 @@
     <span class="ident">Failed</span>,
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;HRX parsing error&quot;</span>]</span> 
+<span class="doccomment">/// HRX parsing error </span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParseError</span> {
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;1-based line # of error&quot;</span>]</span> 
+<span class="doccomment">/// 1-based line # of error </span>
     <span class="kw">pub</span> <span class="ident">line</span>: <span class="ident">usize</span>,
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;1-based column # of error&quot;</span>]</span> 
+<span class="doccomment">/// 1-based column # of error </span>
     <span class="kw">pub</span> <span class="ident">column</span>: <span class="ident">usize</span>,
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;Byte offset of error&quot;</span>]</span> 
+<span class="doccomment">/// Byte offset of error </span>
     <span class="kw">pub</span> <span class="ident">offset</span>: <span class="ident">usize</span>,
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;Expected but unmatched rules&quot;</span>]</span> 
+<span class="doccomment">/// Expected but unmatched rules </span>
     <span class="kw">pub</span> <span class="ident">expected</span>: ::<span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
 }
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">ParseError</span><span class="op">&gt;</span>;
@@ -1205,6 +1227,9 @@
     }
 }
 
+<span class="doccomment">/// `&quot;&lt;&quot; &quot;=&quot;+ &quot;&gt;&quot;`</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Must exactly match the first boundary in the archive</span>
 <span class="kw">fn</span> <span class="ident">__parse_boundary</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>(<span class="ident">__input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span>, <span class="ident">__state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ParseState</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>, <span class="ident">__pos</span>: <span class="ident">usize</span>, <span class="ident">boundary_length</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">RuleResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {# <span class="op">!</span> [ <span class="ident">allow</span> ( <span class="ident">non_snake_case</span> , <span class="ident">unused</span> ) ]    {
         <span class="kw">let</span> <span class="ident">__seq_res</span> <span class="op">=</span> <span class="ident">slice_eq</span>(<span class="ident">__input</span>, <span class="ident">__state</span>, <span class="ident">__pos</span>, <span class="string">&quot;&lt;&quot;</span>);
         <span class="kw">match</span> <span class="ident">__seq_res</span> {
@@ -1252,12 +1277,16 @@
     }
 }
 
+<span class="doccomment">/// U+000A LINE FEED</span>
 <span class="kw">fn</span> <span class="ident">__parse_newline</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>(<span class="ident">__input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span>, <span class="ident">__state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ParseState</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>, <span class="ident">__pos</span>: <span class="ident">usize</span>, <span class="ident">boundary_length</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">RuleResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {# <span class="op">!</span> [ <span class="ident">allow</span> ( <span class="ident">non_snake_case</span> , <span class="ident">unused</span> ) ]    <span class="ident">slice_eq</span>(<span class="ident">__input</span>, <span class="ident">__state</span>, <span class="ident">__pos</span>, <span class="string">&quot;\n&quot;</span>)
 }
 
 <span class="kw">fn</span> <span class="ident">__parse_body</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>(<span class="ident">__input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span>, <span class="ident">__state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ParseState</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>, <span class="ident">__pos</span>: <span class="ident">usize</span>, <span class="ident">boundary_length</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">RuleResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span><span class="op">&gt;</span> {# <span class="op">!</span> [ <span class="ident">allow</span> ( <span class="ident">non_snake_case</span> , <span class="ident">unused</span> ) ]    <span class="ident">__parse_contents</span>(<span class="ident">__input</span>, <span class="ident">__state</span>, <span class="ident">__pos</span>, <span class="ident">boundary_length</span>)
 }
 
+<span class="doccomment">/// Any sequence of characters that does not include U+000A LINE FEED followed immediately by boundary</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The fist pattern stolen from the `@E` &quot;Search loop&quot; expansion from here https://nim-lang.org/docs/pegs.html</span>
 <span class="kw">fn</span> <span class="ident">__parse_contents</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>(<span class="ident">__input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span>, <span class="ident">__state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ParseState</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>, <span class="ident">__pos</span>: <span class="ident">usize</span>, <span class="ident">boundary_length</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">RuleResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span><span class="op">&gt;</span> {# <span class="op">!</span> [ <span class="ident">allow</span> ( <span class="ident">non_snake_case</span> , <span class="ident">unused</span> ) ]    {
         <span class="kw">let</span> <span class="ident">__choice_res</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="ident">__seq_res</span> <span class="op">=</span> {
@@ -1423,6 +1452,9 @@
     }
 }
 
+<span class="doccomment">/// `path-character+`</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Not equal to `&quot;.&quot;` or `&quot;..&quot;`</span>
 <span class="kw">fn</span> <span class="ident">__parse_path_component</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>(<span class="ident">__input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span>, <span class="ident">__state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ParseState</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>, <span class="ident">__pos</span>: <span class="ident">usize</span>, <span class="ident">boundary_length</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">RuleResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span><span class="op">&gt;</span> {# <span class="op">!</span> [ <span class="ident">allow</span> ( <span class="ident">non_snake_case</span> , <span class="ident">unused</span> ) ]    {
         <span class="kw">let</span> <span class="ident">__seq_res</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="ident">str_start</span> <span class="op">=</span> <span class="ident">__pos</span>;
@@ -1476,6 +1508,7 @@
     }
 }
 
+<span class="doccomment">/// Any character other than U+0000 through U+001F, U+007F DELETE, U+002F SOLIDUS, U+003A COLON, or U+005C REVERSE SOLIDUS</span>
 <span class="kw">fn</span> <span class="ident">__parse_path_character</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>(<span class="ident">__input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span>, <span class="ident">__state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ParseState</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>, <span class="ident">__pos</span>: <span class="ident">usize</span>, <span class="ident">boundary_length</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">RuleResult</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> {# <span class="op">!</span> [ <span class="ident">allow</span> ( <span class="ident">non_snake_case</span> , <span class="ident">unused</span> ) ]    {
         <span class="kw">let</span> <span class="ident">__choice_res</span> <span class="op">=</span> {
             <span class="ident">__state</span>.<span class="ident">suppress_fail</span> <span class="op">+=</span> <span class="number">1</span>;
@@ -1520,6 +1553,7 @@
     }
 }
 
+<span class="doccomment">/// `entry* comment?`</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">archive</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>(<span class="ident">__input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span>, <span class="ident">boundary_length</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">HrxArchive</span><span class="op">&gt;</span> {# <span class="op">!</span> [ <span class="ident">allow</span> ( <span class="ident">non_snake_case</span> , <span class="ident">unused</span> ) ]    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">__state</span> <span class="op">=</span> <span class="ident">ParseState</span>::<span class="ident">new</span>();
     <span class="kw">match</span> <span class="ident">__parse_archive</span>(<span class="ident">__input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">__state</span>, <span class="number">0</span>, <span class="ident">boundary_length</span>) {
         <span class="ident">Matched</span>(<span class="ident">__pos</span>, <span class="ident">__value</span>) <span class="op">=&gt;</span> {
@@ -1538,6 +1572,7 @@
     })
 }
 
+<span class="doccomment">/// `comment? (file | directory)`</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">entry</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>(<span class="ident">__input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span>, <span class="ident">boundary_length</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">HrxPath</span>, <span class="ident">HrxEntry</span>)<span class="op">&gt;</span> {# <span class="op">!</span> [ <span class="ident">allow</span> ( <span class="ident">non_snake_case</span> , <span class="ident">unused</span> ) ]    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">__state</span> <span class="op">=</span> <span class="ident">ParseState</span>::<span class="ident">new</span>();
     <span class="kw">match</span> <span class="ident">__parse_entry</span>(<span class="ident">__input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">__state</span>, <span class="number">0</span>, <span class="ident">boundary_length</span>) {
         <span class="ident">Matched</span>(<span class="ident">__pos</span>, <span class="ident">__value</span>) <span class="op">=&gt;</span> {
@@ -1556,6 +1591,7 @@
     })
 }
 
+<span class="doccomment">/// `boundary newline body`</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">comment</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>(<span class="ident">__input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span>, <span class="ident">boundary_length</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span><span class="op">&gt;</span> {# <span class="op">!</span> [ <span class="ident">allow</span> ( <span class="ident">non_snake_case</span> , <span class="ident">unused</span> ) ]    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">__state</span> <span class="op">=</span> <span class="ident">ParseState</span>::<span class="ident">new</span>();
     <span class="kw">match</span> <span class="ident">__parse_comment</span>(<span class="ident">__input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">__state</span>, <span class="number">0</span>, <span class="ident">boundary_length</span>) {
         <span class="ident">Matched</span>(<span class="ident">__pos</span>, <span class="ident">__value</span>) <span class="op">=&gt;</span> {
@@ -1574,6 +1610,7 @@
     })
 }
 
+<span class="doccomment">/// `boundary &quot; &quot;+ path newline body?`</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>(<span class="ident">__input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span>, <span class="ident">boundary_length</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">HrxPath</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {# <span class="op">!</span> [ <span class="ident">allow</span> ( <span class="ident">non_snake_case</span> , <span class="ident">unused</span> ) ]    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">__state</span> <span class="op">=</span> <span class="ident">ParseState</span>::<span class="ident">new</span>();
     <span class="kw">match</span> <span class="ident">__parse_file</span>(<span class="ident">__input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">__state</span>, <span class="number">0</span>, <span class="ident">boundary_length</span>) {
         <span class="ident">Matched</span>(<span class="ident">__pos</span>, <span class="ident">__value</span>) <span class="op">=&gt;</span> {
@@ -1592,6 +1629,7 @@
     })
 }
 
+<span class="doccomment">/// `boundary &quot; &quot;+ path &quot;/&quot; newline+`</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">directory</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>(<span class="ident">__input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span>, <span class="ident">boundary_length</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">HrxPath</span><span class="op">&gt;</span> {# <span class="op">!</span> [ <span class="ident">allow</span> ( <span class="ident">non_snake_case</span> , <span class="ident">unused</span> ) ]    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">__state</span> <span class="op">=</span> <span class="ident">ParseState</span>::<span class="ident">new</span>();
     <span class="kw">match</span> <span class="ident">__parse_directory</span>(<span class="ident">__input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">__state</span>, <span class="number">0</span>, <span class="ident">boundary_length</span>) {
         <span class="ident">Matched</span>(<span class="ident">__pos</span>, <span class="ident">__value</span>) <span class="op">=&gt;</span> {
@@ -1610,6 +1648,11 @@
     })
 }
 
+<span class="doccomment">/// `contents newline`</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// No newline at the end of the archive (if the archive ends in a body, all trailing newlines are part of that body&#39;s contents)</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// NB: this doesn&#39;t explicitly consume a newline as that has been moved down to `contents`.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">body</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>(<span class="ident">__input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span>, <span class="ident">boundary_length</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span><span class="op">&gt;</span> {# <span class="op">!</span> [ <span class="ident">allow</span> ( <span class="ident">non_snake_case</span> , <span class="ident">unused</span> ) ]    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">__state</span> <span class="op">=</span> <span class="ident">ParseState</span>::<span class="ident">new</span>();
     <span class="kw">match</span> <span class="ident">__parse_body</span>(<span class="ident">__input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">__state</span>, <span class="number">0</span>, <span class="ident">boundary_length</span>) {
         <span class="ident">Matched</span>(<span class="ident">__pos</span>, <span class="ident">__value</span>) <span class="op">=&gt;</span> {
@@ -1628,6 +1671,7 @@
     })
 }
 
+<span class="doccomment">/// `path-component (&quot;/&quot; path-component)*`</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span><span class="op">&gt;</span>(<span class="ident">__input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> <span class="ident">str</span>, <span class="ident">boundary_length</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">HrxPath</span><span class="op">&gt;</span> {# <span class="op">!</span> [ <span class="ident">allow</span> ( <span class="ident">non_snake_case</span> , <span class="ident">unused</span> ) ]    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">__state</span> <span class="op">=</span> <span class="ident">ParseState</span>::<span class="ident">new</span>();
     <span class="kw">match</span> <span class="ident">__parse_path</span>(<span class="ident">__input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">__state</span>, <span class="number">0</span>, <span class="ident">boundary_length</span>) {
         <span class="ident">Matched</span>(<span class="ident">__pos</span>, <span class="ident">__value</span>) <span class="op">=&gt;</span> {
