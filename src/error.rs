@@ -30,11 +30,31 @@ pub enum HrxError {
     NoBoundary,
     /// An error occured during parsing
     Parse(grammar::ParseError),
+    /// A body was made to contain the archive boundary. Deserialising the archive would *not* work
+    BodyContainsBoundary(ErroneousBodyPath),
 }
+
+/// A path to a `body` containing an invalid sequence
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ErroneousBodyPath {
+    /// The root archive comment
+    RootComment,
+    /// A comment to the entry with the specified path
+    EntryComment(String),
+    /// The data of the entry with the specified path
+    EntryData(String),
+}
+
 
 impl From<grammar::ParseError> for HrxError {
     fn from(pe: grammar::ParseError) -> HrxError {
         HrxError::Parse(pe)
+    }
+}
+
+impl From<ErroneousBodyPath> for HrxError {
+    fn from(bcb: ErroneousBodyPath) -> HrxError {
+        HrxError::BodyContainsBoundary(bcb)
     }
 }
 
@@ -63,6 +83,14 @@ impl fmt::Display for HrxError {
 
                 fmt.write_str(".")?;
             }
+            &HrxError::BodyContainsBoundary(ref path) => {
+                match path {
+                    ErroneousBodyPath::RootComment => fmt.write_str("Root archive comment")?,
+                    ErroneousBodyPath::EntryComment(ref pp) => write!(fmt, "Comment for \"{}\" entry", pp)?,
+                    ErroneousBodyPath::EntryData(ref pp) => write!(fmt, "Data of \"{}\" entry", pp)?,
+                }
+                fmt.write_str(" contains the archive boundary, making resulting archive not redeserialisable.")?;
+            }
         }
 
         Ok(())
@@ -70,10 +98,10 @@ impl fmt::Display for HrxError {
 }
 
 impl Error for HrxError {
-    fn source(&self)-> Option<&(dyn Error + 'static)> {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
-            &HrxError::NoBoundary => None,
             &HrxError::Parse(ref pe) => Some(pe),
+            _ => None,
         }
     }
 }

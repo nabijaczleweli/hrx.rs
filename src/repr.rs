@@ -1,5 +1,5 @@
+use self::super::{grammar, ErroneousBodyPath, HrxError};
 use jetscii::Substring as SubstringSearcher;
-use self::super::{grammar, HrxError};
 use linked_hash_map::LinkedHashMap;
 use std::borrow::Borrow;
 use std::str::FromStr;
@@ -35,20 +35,28 @@ impl HrxArchive {
         self.boundary_length
     }
 
-    pub fn set_boundary_length(&mut self, new_len: usize) -> Result<(), ()> {
-        let bound: String = "\n<".chars().chain(iter::repeat('=').take(new_len)).chain(">".chars()).collect();
+    pub fn set_boundary_length(&mut self, new_len: usize) -> Result<(), HrxError> {
+        self.validate_boundlen(new_len)?;
+        self.boundary_length = new_len;
+        Ok(())
+    }
+
+    pub fn validate_content(&self) -> Result<(), HrxError> {
+        self.validate_boundlen(self.boundary_length)
+    }
+
+    fn validate_boundlen(&self, len: usize) -> Result<(), HrxError> {
+        let bound: String = "\n<".chars().chain(iter::repeat('=').take(len)).chain(">".chars()).collect();
         let ss = SubstringSearcher::new(&bound);
 
-        verify_opt(&self.comment, &ss)?;
-        for (_, dt) in &self.entries {
-            verify_opt(&dt.comment, &ss)?;
+        verify_opt(&self.comment, &ss).map_err(|_| ErroneousBodyPath::RootComment)?;
+        for (pp, dt) in &self.entries {
+            verify_opt(&dt.comment, &ss).map_err(|_| ErroneousBodyPath::EntryComment(pp.to_string()))?;
             match dt.data {
-                HrxEntryData::File { ref body } => verify_opt(&body, &ss)?,
+                HrxEntryData::File { ref body } => verify_opt(&body, &ss).map_err(|_| ErroneousBodyPath::EntryData(pp.to_string()))?,
                 HrxEntryData::Directory => {}
             }
         }
-
-        self.boundary_length = new_len;
 
         Ok(())
     }
