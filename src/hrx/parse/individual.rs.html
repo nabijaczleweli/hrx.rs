@@ -23,7 +23,7 @@
 <span id="23">23</span>
 <span id="24">24</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">/// Search the specified for the length of the first `boundary`</span>
+<span class="doccomment">/// Search the specified for the length of the first `boundary`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Returns `None` if no valid boundary exists.</span>
 <span class="doccomment">///</span>
@@ -35,7 +35,7 @@
 <span class="doccomment">/// assert_eq!(discover_first_boundary_length(&quot;henlo\n&lt;===&gt; menlo&quot;), Some(3));</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(discover_first_boundary_length(&quot;&lt;&gt;&quot;), None);</span>
-<span class="doccomment">/// assert_eq!(discover_first_boundary_length(&quot;dupa&quot;), None);</span>
+<span class="doccomment">/// assert_eq!(discover_first_boundary_length(&quot;коммунизм&quot;), None);</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">discover_first_boundary_length</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;&gt;</span>(<span class="ident">in_data</span>: <span class="ident">S</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="ident">discover_first_boundary_length_impl</span>(<span class="ident">in_data</span>.<span class="ident">as_ref</span>())

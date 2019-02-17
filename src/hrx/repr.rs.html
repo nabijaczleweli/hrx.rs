@@ -120,6 +120,127 @@
 <span id="120">120</span>
 <span id="121">121</span>
 <span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">parse</span>, <span class="ident">ErroneousBodyPath</span>, <span class="ident">HrxError</span>};
 <span class="kw">use</span> <span class="ident">jetscii</span>::<span class="ident">Substring</span> <span class="kw">as</span> <span class="ident">SubstringSearcher</span>;
@@ -129,46 +250,167 @@
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">iter</span>, <span class="ident">fmt</span>};
 
 
+<span class="doccomment">/// A Human-Readable Archive, consisting of an optional comment and some entries, all separated by the boundary.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The archive boundary consists of a particular-length sequence of `=`s bounded with `&lt;` and `&gt;` on either side;</span>
+<span class="doccomment">/// that sequence must be consistent across  the entirety of the archive, which means that no `body`</span>
+<span class="doccomment">/// (be it a comment or file contents) can contain a newline followed by the boundary.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// However, there is no way to enforce that on the typesystem level, meaning that the entries and comments can be modified at will,</span>
+<span class="doccomment">/// so instead the archive will automatically check for boundary validity when</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///   1. changing the global boundary length (via [`set_boundary_length()`](#method.set_boundary_length)) and</span>
+<span class="doccomment">///   2. serialising to an output stream (be it via the `Display` impl, [`serialise()`](#method.serialise), or any derivatives thereof)</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// and return the path to the first erroneous (i.e. boundary-containing) `body`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HrxArchive</span> {
+    <span class="doccomment">/// Some optional metadata.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Cannot contain a newline followed by a boundary.</span>
     <span class="kw">pub</span> <span class="ident">comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Some optional archive entries with their paths.</span>
     <span class="kw">pub</span> <span class="ident">entries</span>: <span class="ident">LinkedHashMap</span><span class="op">&lt;</span><span class="ident">HrxPath</span>, <span class="ident">HrxEntry</span><span class="op">&gt;</span>,
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">boundary_length</span>: <span class="ident">usize</span>,
 }
 
+<span class="doccomment">/// A single entry in the archive, consisting of an optional comment and some data.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HrxEntry</span> {
+    <span class="doccomment">/// Some optional metadata.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Cannot contain a newline followed by a boundary.</span>
     <span class="kw">pub</span> <span class="ident">comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The specific entry data.</span>
     <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">HrxEntryData</span>,
 }
 
+<span class="doccomment">/// Some variant of an entry&#39;s contained data.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HrxEntryData</span> {
+    <span class="doccomment">/// File with some optional contents.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Cannot contain a newline followed by a boundary.</span>
     <span class="ident">File</span> { <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, },
+    <span class="doccomment">/// Bodyless directory.</span>
     <span class="ident">Directory</span>,
 }
 
+<span class="doccomment">/// Verified-valid path to an entry in the archive.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Paths consist of `/`-separated components, each one consisting of characters higher than U+001F, except `/`, `\\` and `:`.</span>
+<span class="doccomment">/// Components cannot be `.` nor `..`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HrxPath</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">String</span>);
 
 
 <span class="kw">impl</span> <span class="ident">HrxArchive</span> {
+    <span class="doccomment">/// Get the current boundary length, i.e. the amount of `=` characters in the boundary.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use std::str::FromStr;</span>
+    <span class="doccomment">/// # use hrx::HrxArchive;</span>
+    <span class="doccomment">/// let arch_str = r#&quot;&lt;===&gt; input.scss</span>
+    <span class="doccomment">/// ul {</span>
+    <span class="doccomment">///   margin-left: 1em;</span>
+    <span class="doccomment">///   li {</span>
+    <span class="doccomment">///     list-style-type: none;</span>
+    <span class="doccomment">///   }</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// &lt;===&gt; output.css</span>
+    <span class="doccomment">/// ul {</span>
+    <span class="doccomment">///   margin-left: 1em;</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// ul li {</span>
+    <span class="doccomment">///   list-style-type: none;</span>
+    <span class="doccomment">/// }&quot;#;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let arch = HrxArchive::from_str(arch_str).unwrap();</span>
+    <span class="doccomment">/// assert_eq!(arch.boundary_length(), 3);</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boundary_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">boundary_length</span>
     }
 
+    <span class="doccomment">/// Set new boundary length, if valid.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Checks, whether any `body` within the archive contains the new boundary;</span>
+    <span class="doccomment">/// if so – errors out with the path to the first one,</span>
+    <span class="doccomment">/// otherwise sets the boundary length to the specified value.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use hrx::{ErroneousBodyPath, HrxArchive};</span>
+    <span class="doccomment">/// # use std::str::FromStr;</span>
+    <span class="doccomment">/// let arch_str = r#&quot;&lt;===&gt; boundary-5.txt</span>
+    <span class="doccomment">/// This file contains a 5-length boundary:</span>
+    <span class="doccomment">/// &lt;=====&gt;</span>
+    <span class="doccomment">/// ^ right there</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// &lt;===&gt;</span>
+    <span class="doccomment">/// This is a comment,</span>
+    <span class="doccomment">/// &lt;=======&gt;</span>
+    <span class="doccomment">/// which contains a 7-length boundary.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// &lt;===&gt; fine.txt</span>
+    <span class="doccomment">/// This file consists of</span>
+    <span class="doccomment">/// multiple lines, but none of them</span>
+    <span class="doccomment">/// starts with any sort of boundary-like string&quot;#;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut arch = HrxArchive::from_str(arch_str).unwrap();</span>
+    <span class="doccomment">/// assert_eq!(arch.boundary_length(), 3);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(arch.set_boundary_length(4), Ok(()));</span>
+    <span class="doccomment">/// assert_eq!(arch.boundary_length(), 4);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(arch.set_boundary_length(5),</span>
+    <span class="doccomment">///            Err(ErroneousBodyPath::EntryData(&quot;boundary-5.txt&quot;.to_string()).into()));</span>
+    <span class="doccomment">/// assert_eq!(arch.boundary_length(), 4);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(arch.set_boundary_length(6), Ok(()));</span>
+    <span class="doccomment">/// assert_eq!(arch.boundary_length(), 6);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(arch.set_boundary_length(7),</span>
+    <span class="doccomment">///            Err(ErroneousBodyPath::EntryComment(&quot;fine.txt&quot;.to_string()).into()));</span>
+    <span class="doccomment">/// assert_eq!(arch.boundary_length(), 6);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(arch.set_boundary_length(8), Ok(()));</span>
+    <span class="doccomment">/// assert_eq!(arch.boundary_length(), 8);</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_boundary_length</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">new_len</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">HrxError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">validate_boundlen</span>(<span class="ident">new_len</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">boundary_length</span> <span class="op">=</span> <span class="ident">new_len</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
+    <span class="doccomment">/// Validate that no `body`s contain a `boundary` or error out with the path to the first one that does,</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use hrx::{ErroneousBodyPath, HrxArchive};</span>
+    <span class="doccomment">/// # use std::str::FromStr;</span>
+    <span class="doccomment">/// let arch_str = r#&quot;&lt;===&gt;</span>
+    <span class="doccomment">/// A HRX file may consist of only a comment and nothing else.&quot;#;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut arch = HrxArchive::from_str(arch_str).unwrap();</span>
+    <span class="doccomment">/// assert_eq!(arch.validate_content(), Ok(()));</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// *arch.comment.as_mut().unwrap() += &quot;\n&lt;===&gt;\nYeehaw – now the comment contains the boundary!&quot;;</span>
+    <span class="doccomment">/// assert_eq!(arch.validate_content(), Err(ErroneousBodyPath::RootComment.into()));</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">HrxError</span><span class="op">&gt;</span> {
+        <span class="comment">// TODO: make the test use new()</span>
         <span class="self">self</span>.<span class="ident">validate_boundlen</span>(<span class="self">self</span>.<span class="ident">boundary_length</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">validate_boundlen</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">HrxError</span><span class="op">&gt;</span> {
+        <span class="comment">// TODO: sanitise &gt;0</span>
         <span class="kw">let</span> <span class="ident">bound</span>: <span class="ident">String</span> <span class="op">=</span> <span class="string">&quot;\n&lt;&quot;</span>.<span class="ident">chars</span>().<span class="ident">chain</span>(<span class="ident">iter</span>::<span class="ident">repeat</span>(<span class="string">&#39;=&#39;</span>).<span class="ident">take</span>(<span class="ident">len</span>)).<span class="ident">chain</span>(<span class="string">&quot;&gt;&quot;</span>.<span class="ident">chars</span>()).<span class="ident">collect</span>();
         <span class="kw">let</span> <span class="ident">ss</span> <span class="op">=</span> <span class="ident">SubstringSearcher</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">bound</span>);
 
