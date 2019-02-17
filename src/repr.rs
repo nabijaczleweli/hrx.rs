@@ -1,6 +1,7 @@
 use self::super::{parse, ErroneousBodyPath, HrxError};
 use jetscii::Substring as SubstringSearcher;
 use linked_hash_map::LinkedHashMap;
+use std::num::NonZeroUsize;
 use std::borrow::Borrow;
 use std::str::FromStr;
 use std::{iter, fmt};
@@ -12,11 +13,13 @@ use std::{iter, fmt};
 /// that sequence must be consistent across  the entirety of the archive, which means that no `body`
 /// (be it a comment or file contents) can contain a newline followed by the boundary.
 ///
-/// However, there is no way to enforce that on the typesystem level, meaning that the entries and comments can be modified at will,
+/// However, there is no way to enforce that on the typesystem level,
+/// meaning that the entries and comments can be modified at will,
 /// so instead the archive will automatically check for boundary validity when
 ///
 ///   1. changing the global boundary length (via [`set_boundary_length()`](#method.set_boundary_length)) and
-///   2. serialising to an output stream (be it via the `Display` impl, [`serialise()`](#method.serialise), or any derivatives thereof)
+///   2. serialising to an output stream
+///      (be it via the `Display` impl, [`serialise()`](#method.serialise), or any derivatives thereof)
 ///
 /// and return the path to the first erroneous (i.e. boundary-containing) `body`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
@@ -28,7 +31,7 @@ pub struct HrxArchive {
     /// Some optional archive entries with their paths.
     pub entries: LinkedHashMap<HrxPath, HrxEntry>,
 
-    pub(crate) boundary_length: usize,
+    pub(crate) boundary_length: NonZeroUsize,
 }
 
 /// A single entry in the archive, consisting of an optional comment and some data.
@@ -62,6 +65,15 @@ pub struct HrxPath(pub(crate) String);
 
 
 impl HrxArchive {
+    /// Create an empty archive with the specified boundary length.
+    pub fn new(boundary_length: NonZeroUsize) -> HrxArchive {
+        HrxArchive {
+            comment: None,
+            entries: LinkedHashMap::new(),
+            boundary_length: boundary_length,
+        }
+    }
+
     /// Get the current boundary length, i.e. the amount of `=` characters in the boundary.
     ///
     /// # Examples
@@ -86,9 +98,9 @@ impl HrxArchive {
     /// }"#;
     ///
     /// let arch = HrxArchive::from_str(arch_str).unwrap();
-    /// assert_eq!(arch.boundary_length(), 3);
+    /// assert_eq!(arch.boundary_length().get(), 3);
     /// ```
-    pub fn boundary_length(&self) -> usize {
+    pub fn boundary_length(&self) -> NonZeroUsize {
         self.boundary_length
     }
 
@@ -102,6 +114,7 @@ impl HrxArchive {
     ///
     /// ```
     /// # use hrx::{ErroneousBodyPath, HrxArchive};
+    /// # use std::num::NonZeroUsize;
     /// # use std::str::FromStr;
     /// let arch_str = r#"<===> boundary-5.txt
     /// This file contains a 5-length boundary:
@@ -119,26 +132,26 @@ impl HrxArchive {
     /// starts with any sort of boundary-like string"#;
     ///
     /// let mut arch = HrxArchive::from_str(arch_str).unwrap();
-    /// assert_eq!(arch.boundary_length(), 3);
+    /// assert_eq!(arch.boundary_length().get(), 3);
     ///
-    /// assert_eq!(arch.set_boundary_length(4), Ok(()));
-    /// assert_eq!(arch.boundary_length(), 4);
+    /// assert_eq!(arch.set_boundary_length(NonZeroUsize::new(4).unwrap()), Ok(()));
+    /// assert_eq!(arch.boundary_length().get(), 4);
     ///
-    /// assert_eq!(arch.set_boundary_length(5),
+    /// assert_eq!(arch.set_boundary_length(NonZeroUsize::new(5).unwrap()),
     ///            Err(ErroneousBodyPath::EntryData("boundary-5.txt".to_string()).into()));
-    /// assert_eq!(arch.boundary_length(), 4);
+    /// assert_eq!(arch.boundary_length().get(), 4);
     ///
-    /// assert_eq!(arch.set_boundary_length(6), Ok(()));
-    /// assert_eq!(arch.boundary_length(), 6);
+    /// assert_eq!(arch.set_boundary_length(NonZeroUsize::new(6).unwrap()), Ok(()));
+    /// assert_eq!(arch.boundary_length().get(), 6);
     ///
-    /// assert_eq!(arch.set_boundary_length(7),
+    /// assert_eq!(arch.set_boundary_length(NonZeroUsize::new(7).unwrap()),
     ///            Err(ErroneousBodyPath::EntryComment("fine.txt".to_string()).into()));
-    /// assert_eq!(arch.boundary_length(), 6);
+    /// assert_eq!(arch.boundary_length().get(), 6);
     ///
-    /// assert_eq!(arch.set_boundary_length(8), Ok(()));
-    /// assert_eq!(arch.boundary_length(), 8);
+    /// assert_eq!(arch.set_boundary_length(NonZeroUsize::new(8).unwrap()), Ok(()));
+    /// assert_eq!(arch.boundary_length().get(), 8);
     /// ```
-    pub fn set_boundary_length(&mut self, new_len: usize) -> Result<(), HrxError> {
+    pub fn set_boundary_length(&mut self, new_len: NonZeroUsize) -> Result<(), HrxError> {
         self.validate_boundlen(new_len)?;
         self.boundary_length = new_len;
         Ok(())
@@ -150,24 +163,18 @@ impl HrxArchive {
     ///
     /// ```
     /// # use hrx::{ErroneousBodyPath, HrxArchive};
-    /// # use std::str::FromStr;
-    /// let arch_str = r#"<===>
-    /// A HRX file may consist of only a comment and nothing else."#;
+    /// # use std::num::NonZeroUsize;
+    /// let mut arch = HrxArchive::new(NonZeroUsize::new(3).unwrap());
+    /// arch.comment = Some("Yeehaw! the comment\n<===>\n contains the boundary!".to_string());
     ///
-    /// let mut arch = HrxArchive::from_str(arch_str).unwrap();
-    /// assert_eq!(arch.validate_content(), Ok(()));
-    ///
-    /// *arch.comment.as_mut().unwrap() += "\n<===>\nYeehaw – now the comment contains the boundary!";
     /// assert_eq!(arch.validate_content(), Err(ErroneousBodyPath::RootComment.into()));
     /// ```
     pub fn validate_content(&self) -> Result<(), HrxError> {
-        // TODO: make the test use new()
         self.validate_boundlen(self.boundary_length)
     }
 
-    fn validate_boundlen(&self, len: usize) -> Result<(), HrxError> {
-        // TODO: sanitise >0
-        let bound: String = "\n<".chars().chain(iter::repeat('=').take(len)).chain(">".chars()).collect();
+    fn validate_boundlen(&self, len: NonZeroUsize) -> Result<(), HrxError> {
+        let bound: String = "\n<".chars().chain(iter::repeat('=').take(len.get())).chain(">".chars()).collect();
         let ss = SubstringSearcher::new(&bound);
 
         verify_opt(&self.comment, &ss).map_err(|_| ErroneousBodyPath::RootComment)?;
@@ -230,7 +237,7 @@ impl FromStr for HrxPath {
     type Err = HrxError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let parsed = parse::path(s, 0)?;
+        let parsed = parse::path(s, NonZeroUsize::new(1).unwrap())?;
 
         Ok(parsed)
     }
