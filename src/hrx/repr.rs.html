@@ -241,10 +241,18 @@
 <span id="241">241</span>
 <span id="242">242</span>
 <span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">parse</span>, <span class="ident">ErroneousBodyPath</span>, <span class="ident">HrxError</span>};
 <span class="kw">use</span> <span class="ident">jetscii</span>::<span class="ident">Substring</span> <span class="kw">as</span> <span class="ident">SubstringSearcher</span>;
 <span class="kw">use</span> <span class="ident">linked_hash_map</span>::<span class="ident">LinkedHashMap</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">num</span>::<span class="ident">NonZeroUsize</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Borrow</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">iter</span>, <span class="ident">fmt</span>};
@@ -256,11 +264,13 @@
 <span class="doccomment">/// that sequence must be consistent across  the entirety of the archive, which means that no `body`</span>
 <span class="doccomment">/// (be it a comment or file contents) can contain a newline followed by the boundary.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// However, there is no way to enforce that on the typesystem level, meaning that the entries and comments can be modified at will,</span>
+<span class="doccomment">/// However, there is no way to enforce that on the typesystem level,</span>
+<span class="doccomment">/// meaning that the entries and comments can be modified at will,</span>
 <span class="doccomment">/// so instead the archive will automatically check for boundary validity when</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///   1. changing the global boundary length (via [`set_boundary_length()`](#method.set_boundary_length)) and</span>
-<span class="doccomment">///   2. serialising to an output stream (be it via the `Display` impl, [`serialise()`](#method.serialise), or any derivatives thereof)</span>
+<span class="doccomment">///   2. serialising to an output stream</span>
+<span class="doccomment">///      (be it via the `Display` impl, [`serialise()`](#method.serialise), or any derivatives thereof)</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// and return the path to the first erroneous (i.e. boundary-containing) `body`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
@@ -272,7 +282,7 @@
     <span class="doccomment">/// Some optional archive entries with their paths.</span>
     <span class="kw">pub</span> <span class="ident">entries</span>: <span class="ident">LinkedHashMap</span><span class="op">&lt;</span><span class="ident">HrxPath</span>, <span class="ident">HrxEntry</span><span class="op">&gt;</span>,
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">boundary_length</span>: <span class="ident">usize</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">boundary_length</span>: <span class="ident">NonZeroUsize</span>,
 }
 
 <span class="doccomment">/// A single entry in the archive, consisting of an optional comment and some data.</span>
@@ -306,6 +316,15 @@
 
 
 <span class="kw">impl</span> <span class="ident">HrxArchive</span> {
+    <span class="doccomment">/// Create an empty archive with the specified boundary length.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">boundary_length</span>: <span class="ident">NonZeroUsize</span>) <span class="op">-&gt;</span> <span class="ident">HrxArchive</span> {
+        <span class="ident">HrxArchive</span> {
+            <span class="ident">comment</span>: <span class="prelude-val">None</span>,
+            <span class="ident">entries</span>: <span class="ident">LinkedHashMap</span>::<span class="ident">new</span>(),
+            <span class="ident">boundary_length</span>: <span class="ident">boundary_length</span>,
+        }
+    }
+
     <span class="doccomment">/// Get the current boundary length, i.e. the amount of `=` characters in the boundary.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
@@ -330,9 +349,9 @@
     <span class="doccomment">/// }&quot;#;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let arch = HrxArchive::from_str(arch_str).unwrap();</span>
-    <span class="doccomment">/// assert_eq!(arch.boundary_length(), 3);</span>
+    <span class="doccomment">/// assert_eq!(arch.boundary_length().get(), 3);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boundary_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boundary_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">NonZeroUsize</span> {
         <span class="self">self</span>.<span class="ident">boundary_length</span>
     }
 
@@ -346,6 +365,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # use hrx::{ErroneousBodyPath, HrxArchive};</span>
+    <span class="doccomment">/// # use std::num::NonZeroUsize;</span>
     <span class="doccomment">/// # use std::str::FromStr;</span>
     <span class="doccomment">/// let arch_str = r#&quot;&lt;===&gt; boundary-5.txt</span>
     <span class="doccomment">/// This file contains a 5-length boundary:</span>
@@ -363,26 +383,26 @@
     <span class="doccomment">/// starts with any sort of boundary-like string&quot;#;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut arch = HrxArchive::from_str(arch_str).unwrap();</span>
-    <span class="doccomment">/// assert_eq!(arch.boundary_length(), 3);</span>
+    <span class="doccomment">/// assert_eq!(arch.boundary_length().get(), 3);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(arch.set_boundary_length(4), Ok(()));</span>
-    <span class="doccomment">/// assert_eq!(arch.boundary_length(), 4);</span>
+    <span class="doccomment">/// assert_eq!(arch.set_boundary_length(NonZeroUsize::new(4).unwrap()), Ok(()));</span>
+    <span class="doccomment">/// assert_eq!(arch.boundary_length().get(), 4);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(arch.set_boundary_length(5),</span>
+    <span class="doccomment">/// assert_eq!(arch.set_boundary_length(NonZeroUsize::new(5).unwrap()),</span>
     <span class="doccomment">///            Err(ErroneousBodyPath::EntryData(&quot;boundary-5.txt&quot;.to_string()).into()));</span>
-    <span class="doccomment">/// assert_eq!(arch.boundary_length(), 4);</span>
+    <span class="doccomment">/// assert_eq!(arch.boundary_length().get(), 4);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(arch.set_boundary_length(6), Ok(()));</span>
-    <span class="doccomment">/// assert_eq!(arch.boundary_length(), 6);</span>
+    <span class="doccomment">/// assert_eq!(arch.set_boundary_length(NonZeroUsize::new(6).unwrap()), Ok(()));</span>
+    <span class="doccomment">/// assert_eq!(arch.boundary_length().get(), 6);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(arch.set_boundary_length(7),</span>
+    <span class="doccomment">/// assert_eq!(arch.set_boundary_length(NonZeroUsize::new(7).unwrap()),</span>
     <span class="doccomment">///            Err(ErroneousBodyPath::EntryComment(&quot;fine.txt&quot;.to_string()).into()));</span>
-    <span class="doccomment">/// assert_eq!(arch.boundary_length(), 6);</span>
+    <span class="doccomment">/// assert_eq!(arch.boundary_length().get(), 6);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(arch.set_boundary_length(8), Ok(()));</span>
-    <span class="doccomment">/// assert_eq!(arch.boundary_length(), 8);</span>
+    <span class="doccomment">/// assert_eq!(arch.set_boundary_length(NonZeroUsize::new(8).unwrap()), Ok(()));</span>
+    <span class="doccomment">/// assert_eq!(arch.boundary_length().get(), 8);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_boundary_length</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">new_len</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">HrxError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_boundary_length</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">new_len</span>: <span class="ident">NonZeroUsize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">HrxError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">validate_boundlen</span>(<span class="ident">new_len</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">boundary_length</span> <span class="op">=</span> <span class="ident">new_len</span>;
         <span class="prelude-val">Ok</span>(())
@@ -394,24 +414,18 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # use hrx::{ErroneousBodyPath, HrxArchive};</span>
-    <span class="doccomment">/// # use std::str::FromStr;</span>
-    <span class="doccomment">/// let arch_str = r#&quot;&lt;===&gt;</span>
-    <span class="doccomment">/// A HRX file may consist of only a comment and nothing else.&quot;#;</span>
+    <span class="doccomment">/// # use std::num::NonZeroUsize;</span>
+    <span class="doccomment">/// let mut arch = HrxArchive::new(NonZeroUsize::new(3).unwrap());</span>
+    <span class="doccomment">/// arch.comment = Some(&quot;Yeehaw! the comment\n&lt;===&gt;\n contains the boundary!&quot;.to_string());</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut arch = HrxArchive::from_str(arch_str).unwrap();</span>
-    <span class="doccomment">/// assert_eq!(arch.validate_content(), Ok(()));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *arch.comment.as_mut().unwrap() += &quot;\n&lt;===&gt;\nYeehaw – now the comment contains the boundary!&quot;;</span>
     <span class="doccomment">/// assert_eq!(arch.validate_content(), Err(ErroneousBodyPath::RootComment.into()));</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">HrxError</span><span class="op">&gt;</span> {
-        <span class="comment">// TODO: make the test use new()</span>
         <span class="self">self</span>.<span class="ident">validate_boundlen</span>(<span class="self">self</span>.<span class="ident">boundary_length</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_boundlen</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">HrxError</span><span class="op">&gt;</span> {
-        <span class="comment">// TODO: sanitise &gt;0</span>
-        <span class="kw">let</span> <span class="ident">bound</span>: <span class="ident">String</span> <span class="op">=</span> <span class="string">&quot;\n&lt;&quot;</span>.<span class="ident">chars</span>().<span class="ident">chain</span>(<span class="ident">iter</span>::<span class="ident">repeat</span>(<span class="string">&#39;=&#39;</span>).<span class="ident">take</span>(<span class="ident">len</span>)).<span class="ident">chain</span>(<span class="string">&quot;&gt;&quot;</span>.<span class="ident">chars</span>()).<span class="ident">collect</span>();
+    <span class="kw">fn</span> <span class="ident">validate_boundlen</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">len</span>: <span class="ident">NonZeroUsize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">HrxError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">bound</span>: <span class="ident">String</span> <span class="op">=</span> <span class="string">&quot;\n&lt;&quot;</span>.<span class="ident">chars</span>().<span class="ident">chain</span>(<span class="ident">iter</span>::<span class="ident">repeat</span>(<span class="string">&#39;=&#39;</span>).<span class="ident">take</span>(<span class="ident">len</span>.<span class="ident">get</span>())).<span class="ident">chain</span>(<span class="string">&quot;&gt;&quot;</span>.<span class="ident">chars</span>()).<span class="ident">collect</span>();
         <span class="kw">let</span> <span class="ident">ss</span> <span class="op">=</span> <span class="ident">SubstringSearcher</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">bound</span>);
 
         <span class="ident">verify_opt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">comment</span>, <span class="kw-2">&amp;</span><span class="ident">ss</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ErroneousBodyPath</span>::<span class="ident">RootComment</span>)<span class="question-mark">?</span>;
@@ -474,7 +488,7 @@
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">HrxError</span>;
 
     <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">parsed</span> <span class="op">=</span> <span class="ident">parse</span>::<span class="ident">path</span>(<span class="ident">s</span>, <span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">parsed</span> <span class="op">=</span> <span class="ident">parse</span>::<span class="ident">path</span>(<span class="ident">s</span>, <span class="ident">NonZeroUsize</span>::<span class="ident">new</span>(<span class="number">1</span>).<span class="ident">unwrap</span>())<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">parsed</span>)
     }
