@@ -34,7 +34,7 @@ pub enum HrxError {
     BodyContainsBoundary(ErroneousBodyPath),
 }
 
-/// A path to a `body` containing an invalid sequence
+/// A path to a `body` which contains an invalid sequence
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ErroneousBodyPath {
     /// The root archive comment

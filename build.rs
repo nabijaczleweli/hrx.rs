@@ -17,6 +17,7 @@ fn main() {
         m.insert("    pub column: usize,", "1-based column # of error");
         m.insert("    pub offset: usize,", "Byte offset of error");
         m.insert("    pub expected: ::std::collections::HashSet<&'static str>,", "Expected but unmatched rules");
+        m.insert("pub type ParseResult<T> = Result<T, ParseError>;", "Convenience result type");
         m
     };
 

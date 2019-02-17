@@ -1,4 +1,4 @@
-/// Search the specified for the length of the first `boundary`
+/// Search the specified for the length of the first `boundary`.
 ///
 /// Returns `None` if no valid boundary exists.
 ///
@@ -10,7 +10,7 @@
 /// assert_eq!(discover_first_boundary_length("henlo\n<===> menlo"), Some(3));
 ///
 /// assert_eq!(discover_first_boundary_length("<>"), None);
-/// assert_eq!(discover_first_boundary_length("dupa"), None);
+/// assert_eq!(discover_first_boundary_length("коммунизм"), None);
 /// ```
 pub fn discover_first_boundary_length<S: AsRef<str>>(in_data: S) -> Option<usize> {
     discover_first_boundary_length_impl(in_data.as_ref())
