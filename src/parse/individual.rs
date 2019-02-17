@@ -5,7 +5,7 @@
 /// # Examples
 ///
 /// ```
-/// # use hrx::grammar::discover_first_boundary_length;
+/// # use hrx::parse::discover_first_boundary_length;
 /// assert_eq!(discover_first_boundary_length("<=====>"), Some(5));
 /// assert_eq!(discover_first_boundary_length("henlo\n<===> menlo"), Some(3));
 ///

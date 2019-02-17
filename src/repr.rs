@@ -1,4 +1,4 @@
-use self::super::{grammar, ErroneousBodyPath, HrxError};
+use self::super::{parse, ErroneousBodyPath, HrxError};
 use jetscii::Substring as SubstringSearcher;
 use linked_hash_map::LinkedHashMap;
 use std::borrow::Borrow;
@@ -76,8 +76,8 @@ impl FromStr for HrxArchive {
     type Err = HrxError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let width = grammar::discover_first_boundary_length(s).ok_or(HrxError::NoBoundary)?;
-        let parsed = grammar::archive(s, width)?;
+        let width = parse::discover_first_boundary_length(s).ok_or(HrxError::NoBoundary)?;
+        let parsed = parse::archive(s, width)?;
 
         Ok(parsed)
     }
@@ -109,7 +109,7 @@ impl FromStr for HrxPath {
     type Err = HrxError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let parsed = grammar::path(s, 0)?;
+        let parsed = parse::path(s, 0)?;
 
         Ok(parsed)
     }

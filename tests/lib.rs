@@ -1,3 +1,3 @@
 extern crate hrx;
 
-mod grammar;
+mod parse;

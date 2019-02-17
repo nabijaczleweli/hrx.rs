@@ -1,7 +1,7 @@
 //! This is an adaptation of the example/invalid/invalid-paths.hrx file in the original google/hrx repository.
 
 
-use hrx::grammar::{ParseError, path};
+use hrx::parse::{ParseError, path};
 
 
 #[test]

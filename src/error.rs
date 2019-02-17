@@ -1,4 +1,4 @@
-use self::super::grammar;
+use self::super::parse;
 use std::error::Error;
 use lazysort::Sorted;
 use std::fmt;
@@ -10,7 +10,7 @@ use std::fmt;
 ///
 /// ```
 /// # use hrx::{HrxArchive, HrxError};
-/// # use hrx::grammar::ParseError;
+/// # use hrx::parse::ParseError;
 /// # use std::str::FromStr;
 /// assert_eq!(HrxArchive::from_str("Not an actual archive, missing a boundary"),
 ///            Err(HrxError::NoBoundary));
@@ -29,7 +29,7 @@ pub enum HrxError {
     /// No valid HRX boundary found
     NoBoundary,
     /// An error occured during parsing
-    Parse(grammar::ParseError),
+    Parse(parse::ParseError),
     /// A body was made to contain the archive boundary. Deserialising the archive would *not* work
     BodyContainsBoundary(ErroneousBodyPath),
 }
@@ -46,8 +46,8 @@ pub enum ErroneousBodyPath {
 }
 
 
-impl From<grammar::ParseError> for HrxError {
-    fn from(pe: grammar::ParseError) -> HrxError {
+impl From<parse::ParseError> for HrxError {
+    fn from(pe: parse::ParseError) -> HrxError {
         HrxError::Parse(pe)
     }
 }

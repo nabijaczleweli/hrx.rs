@@ -23,7 +23,7 @@ fn main() {
 
     let mut doc_buf = vec![];
     let mut doc_map = vec![];
-    for line in BufReader::new(File::open("src/grammar/main.rustpeg").expect("Opening grammar source")).lines() {
+    for line in BufReader::new(File::open("src/parse/grammar.rustpeg").expect("Opening grammar source")).lines() {
         let line = line.expect("Reading line of grammar source");
 
         if line.starts_with("///") {
@@ -37,8 +37,8 @@ fn main() {
         }
     }
 
-    let grammar_rs = PathBuf::from(format!("{}/main.rs", out_dir));
-    peg::cargo_build("src/grammar/main.rustpeg");
+    let grammar_rs = PathBuf::from(format!("{}/grammar.rs", out_dir));
+    peg::cargo_build("src/parse/grammar.rustpeg");
     let _ = rustfmt::run(rustfmt::Input::File(grammar_rs.clone()),
                          &rustfmt::config::Config::from_toml_path(Path::new("rustfmt.toml")).expect("constructing rustfmt::Config from rustfmt.toml"));
 
