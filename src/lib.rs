@@ -3,6 +3,7 @@ extern crate lazysort;
 #[macro_use]
 extern crate jetscii;
 
+pub mod util;
 pub mod parse;
 
 mod repr;

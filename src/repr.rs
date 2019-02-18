@@ -1,10 +1,11 @@
 use self::super::{parse, ErroneousBodyPath, HrxError};
 use jetscii::Substring as SubstringSearcher;
+use self::super::util::boundary_str;
 use linked_hash_map::LinkedHashMap;
 use std::num::NonZeroUsize;
 use std::borrow::Borrow;
 use std::str::FromStr;
-use std::{iter, fmt};
+use std::fmt;
 
 
 /// A Human-Readable Archive, consisting of an optional comment and some entries, all separated by the boundary.
@@ -174,7 +175,7 @@ impl HrxArchive {
     }
 
     fn validate_boundlen(&self, len: NonZeroUsize) -> Result<(), HrxError> {
-        let bound: String = "\n<".chars().chain(iter::repeat('=').take(len.get())).chain(">".chars()).collect();
+        let bound = boundary_str(len);
         let ss = SubstringSearcher::new(&bound);
 
         verify_opt(&self.comment, &ss).map_err(|_| ErroneousBodyPath::RootComment)?;
