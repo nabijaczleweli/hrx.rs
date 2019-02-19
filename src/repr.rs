@@ -1,5 +1,7 @@
 use self::super::{parse, ErroneousBodyPath, HrxError};
 use jetscii::Substring as SubstringSearcher;
+use self::super::output::write_archive;
+use std::io::{Error as IoError, Write};
 use self::super::util::boundary_str;
 use linked_hash_map::LinkedHashMap;
 use std::num::NonZeroUsize;
@@ -19,8 +21,7 @@ use std::fmt;
 /// so instead the archive will automatically check for boundary validity when
 ///
 ///   1. changing the global boundary length (via [`set_boundary_length()`](#method.set_boundary_length)) and
-///   2. serialising to an output stream
-///      (be it via the `Display` impl, [`serialise()`](#method.serialise), or any derivatives thereof)
+///   2. serialising to an output stream (usually via [`serialise()`](#method.serialise))
 ///
 /// and return the path to the first erroneous (i.e. boundary-containing) `body`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
@@ -188,6 +189,94 @@ impl HrxArchive {
         }
 
         Ok(())
+    }
+
+    /// Write the archive out to the specified output stream, after verification.
+    ///
+    /// The compound result type is due to the fact that `std::io::Error` doesn't play well with having it in an enum variant.
+    ///
+    /// # Examples
+    ///
+    /// Failed validation:
+    ///
+    /// ```
+    /// # use hrx::{ErroneousBodyPath, HrxArchive, HrxPath};
+    /// # use std::num::NonZeroUsize;
+    /// let mut arch = HrxArchive::new(NonZeroUsize::new(3).unwrap());
+    /// arch.comment = Some("Yeehaw! the comment\n<===>\n contains the boundary!".to_string());
+    ///
+    /// let mut out = vec![];
+    /// assert_eq!(arch.serialise(&mut out).unwrap_err().unwrap(),
+    ///            ErroneousBodyPath::RootComment.into());
+    /// // Note how the returned result cannot be directly compared to,
+    /// // as a byproduct of `std::io::Error` being contained therein.
+    /// ```
+    ///
+    /// Generation:
+    ///
+    /// ```
+    /// # use hrx::{ErroneousBodyPath, HrxEntryData, HrxArchive, HrxEntry, HrxPath};
+    /// # use std::num::NonZeroUsize;
+    /// let mut arch = HrxArchive::new(NonZeroUsize::new(5).unwrap());
+    /// arch.comment =
+    ///     Some("This is the archive comment, forthlaying its contents' description".to_string());
+    ///
+    /// arch.entries.insert("directory".parse().unwrap(), HrxEntry {
+    ///     comment: Some("This directory contains files!".to_string()),
+    ///     data: HrxEntryData::Directory,
+    /// });
+    ///
+    /// arch.entries.insert("directory/dsc.txt".parse().unwrap(), HrxEntry {
+    ///     comment:
+    ///         Some("This file forthlays the building blocks of any stable society".to_string()),
+    ///     data: HrxEntryData::File {
+    ///         body: Some("Коммунизм!\n".to_string()),
+    ///     },
+    /// });
+    ///
+    /// let mut out = vec![];
+    /// arch.serialise(&mut out).unwrap();
+    /// assert_eq!(String::from_utf8(out).unwrap(), r#"<=====>
+    /// This directory contains files!
+    /// <=====> directory/
+    /// <=====>
+    /// This file forthlays the building blocks of any stable society
+    /// <=====> directory/dsc.txt
+    /// Коммунизм!
+    ///
+    /// <=====>
+    /// This is the archive comment, forthlaying its contents' description"#);
+    /// ```
+    ///
+    /// Transserialisation:
+    ///
+    /// ```
+    /// # use std::str::FromStr;
+    /// # use hrx::HrxArchive;
+    /// let arch_str = r#"<===> input.scss
+    /// ul {
+    ///   margin-left: 1em;
+    ///   li {
+    ///     list-style-type: none;
+    ///   }
+    /// }
+    ///
+    /// <===> output.css
+    /// ul {
+    ///   margin-left: 1em;
+    /// }
+    /// ul li {
+    ///   list-style-type: none;
+    /// }"#;
+    ///
+    /// let arch = HrxArchive::from_str(arch_str).unwrap();
+    ///
+    /// let mut out = vec![];
+    /// arch.serialise(&mut out).unwrap();
+    /// assert_eq!(String::from_utf8(out).unwrap(), arch_str);
+    /// ```
+    pub fn serialise<W: Write>(&self, into: &mut W) -> Result<(), Result<HrxError, IoError>> {
+        write_archive(&self, into)
     }
 }
 
