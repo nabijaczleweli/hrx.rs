@@ -23,7 +23,7 @@ use std::fmt;
 ///   1. changing the global boundary length (via [`set_boundary_length()`](#method.set_boundary_length)) and
 ///   2. serialising to an output stream (usually via [`serialise()`](#method.serialise))
 ///
-/// and return the path to the first erroneous (i.e. boundary-containing) `body`.
+/// and return the paths to the erroneous (i.e. boundary-containing) `body`s.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct HrxArchive {
     /// Some optional metadata.
@@ -108,8 +108,8 @@ impl HrxArchive {
 
     /// Set new boundary length, if valid.
     ///
-    /// Checks, whether any `body` within the archive contains the new boundary;
-    /// if so – errors out with the path to the first one,
+    /// Checks, whether any `body`s within the archive contain the new boundary;
+    /// if so – errors out with their paths,
     /// otherwise sets the boundary length to the specified value.
     ///
     /// # Examples
@@ -159,17 +159,26 @@ impl HrxArchive {
         Ok(())
     }
 
-    /// Validate that no `body`s contain a `boundary` or error out with the path to the first one that does,
+    /// Validate that no `body`s contain a `boundary` or error out with the paths to the ones that do,
     ///
     /// # Examples
     ///
     /// ```
-    /// # use hrx::{ErroneousBodyPath, HrxArchive};
+    /// # use hrx::{ErroneousBodyPath, HrxEntryData, HrxArchive, HrxEntry};
     /// # use std::num::NonZeroUsize;
     /// let mut arch = HrxArchive::new(NonZeroUsize::new(3).unwrap());
     /// arch.comment = Some("Yeehaw! the comment\n<===>\n contains the boundary!".to_string());
     ///
-    /// assert_eq!(arch.validate_content(), Err(ErroneousBodyPath::RootComment.into()));
+    /// arch.entries.insert("directory/dsc.txt".parse().unwrap(), HrxEntry {
+    ///     comment: None,
+    ///     data: HrxEntryData::File {
+    ///         body: Some("As does this file\n<===>, whew!".to_string()),
+    ///     },
+    /// });
+    ///
+    /// assert_eq!(arch.validate_content(),
+    ///            Err(vec![ErroneousBodyPath::RootComment,
+    ///                     ErroneousBodyPath::EntryData("directory/dsc.txt".to_string())].into()));
     /// ```
     pub fn validate_content(&self) -> Result<(), HrxError> {
         self.validate_boundlen(self.boundary_length)
@@ -179,16 +188,24 @@ impl HrxArchive {
         let bound = boundary_str(len);
         let ss = SubstringSearcher::new(&bound);
 
-        verify_opt(&self.comment, &ss).map_err(|_| ErroneousBodyPath::RootComment)?;
+        let mut paths = vec![];
+
+        let _ = verify_opt(&self.comment, &ss).map_err(|_| paths.push(ErroneousBodyPath::RootComment));
         for (pp, dt) in &self.entries {
-            verify_opt(&dt.comment, &ss).map_err(|_| ErroneousBodyPath::EntryComment(pp.to_string()))?;
+            let _ = verify_opt(&dt.comment, &ss).map_err(|_| paths.push(ErroneousBodyPath::EntryComment(pp.to_string())));
             match dt.data {
-                HrxEntryData::File { ref body } => verify_opt(&body, &ss).map_err(|_| ErroneousBodyPath::EntryData(pp.to_string()))?,
+                HrxEntryData::File { ref body } => {
+                    let _ = verify_opt(&body, &ss).map_err(|_| paths.push(ErroneousBodyPath::EntryData(pp.to_string())));
+                }
                 HrxEntryData::Directory => {}
             }
         }
 
-        Ok(())
+        if !paths.is_empty() {
+            Err(paths.into())
+        } else {
+            Ok(())
+        }
     }
 
     /// Write the archive out to the specified output stream, after verification.

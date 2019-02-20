@@ -1,7 +1,7 @@
+use std::fmt::{self, Write};
 use self::super::parse;
 use std::error::Error;
 use lazysort::Sorted;
-use std::fmt;
 
 
 /// Generic error type, encompassing more precise errors.
@@ -30,8 +30,8 @@ pub enum HrxError {
     NoBoundary,
     /// An error occured during parsing
     Parse(parse::ParseError),
-    /// A body was made to contain the archive boundary. Deserialising the archive would *not* work
-    BodyContainsBoundary(ErroneousBodyPath),
+    /// Some `body`s were made to contain the archive boundary. Deserialising the archive wouldn't work as expected
+    BodyContainsBoundary(Vec<ErroneousBodyPath>),
 }
 
 /// A path to a `body` which contains an invalid sequence
@@ -53,8 +53,14 @@ impl From<parse::ParseError> for HrxError {
 }
 
 impl From<ErroneousBodyPath> for HrxError {
-    fn from(bcb: ErroneousBodyPath) -> HrxError {
-        HrxError::BodyContainsBoundary(bcb)
+   fn from(bcb: ErroneousBodyPath) -> HrxError {
+       HrxError::BodyContainsBoundary(vec![bcb])
+   }
+}
+
+impl<V: Into<Vec<ErroneousBodyPath>>> From<V> for HrxError {
+    fn from(paths: V) -> HrxError {
+        HrxError::BodyContainsBoundary(paths.into())
     }
 }
 
@@ -83,13 +89,49 @@ impl fmt::Display for HrxError {
 
                 fmt.write_str(".")?;
             }
-            &HrxError::BodyContainsBoundary(ref path) => {
-                match path {
-                    ErroneousBodyPath::RootComment => fmt.write_str("Root archive comment")?,
-                    ErroneousBodyPath::EntryComment(ref pp) => write!(fmt, "Comment for \"{}\" entry", pp)?,
-                    ErroneousBodyPath::EntryData(ref pp) => write!(fmt, "Data of \"{}\" entry", pp)?,
+            &HrxError::BodyContainsBoundary(ref paths) => {
+                fn first_char(fmt: &mut fmt::Formatter, c: char, first: bool, last: bool) -> fmt::Result {
+                    if first {
+                        write!(fmt, "{}", c.to_uppercase())?
+                    } else {
+                        fmt.write_str(", ")?;
+                        if last {
+                            fmt.write_str("and ")?;
+                        }
+                        fmt.write_char(c)?;
+                    }
+
+                    Ok(())
                 }
-                fmt.write_str(" contains the archive boundary, making resulting archive not redeserialisable.")?;
+
+
+                if !paths.is_empty() {
+                    for (i, path) in paths.iter().enumerate() {
+                        let first = i == 0;
+                        let last = i == paths.len();
+                        match path {
+                            ErroneousBodyPath::RootComment => {
+                                first_char(fmt, 'r', first, last)?;
+                                fmt.write_str("oot archive comment")?
+                            }
+                            ErroneousBodyPath::EntryComment(ref pp) => {
+                                first_char(fmt, 'c', first, last)?;
+                                write!(fmt, "omment for \"{}\" entry", pp)?
+                            }
+                            ErroneousBodyPath::EntryData(ref pp) => {
+                                first_char(fmt, 'd', first, last)?;
+                                write!(fmt, "ata of \"{}\" entry", pp)?
+                            }
+                        }
+                    }
+                    fmt.write_str(" contain")?;
+                    if paths.len() != 1 {
+                        fmt.write_char('s')?;
+                    }
+                    fmt.write_str(" the archive boundary, making resulting archive not redeserialisable.")?;
+                } else {
+                    fmt.write_str("No paths specified.")?;
+                }
             }
         }
 
