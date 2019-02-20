@@ -21,6 +21,7 @@ sourcesIndex['hrx'] = {"name":"","dirs":[{"name":"grammar","dirs":[],"files":["i
 sourcesIndex['hrx'] = {"name":"","dirs":[{"name":"grammar","dirs":[],"files":["individual.rs","main.rs","mod.rs"]}],"files":["lib.rs","repr.rs"]};
 sourcesIndex['hrx'] = {"name":"","dirs":[{"name":"grammar","dirs":[],"files":["individual.rs","main.rs","mod.rs"]}],"files":["lib.rs","repr.rs"]};
 sourcesIndex['hrx'] = {"name":"","dirs":[{"name":"parse","dirs":[],"files":["grammar.rs","individual.rs","mod.rs"]}],"files":["error.rs","lib.rs","repr.rs","util.rs"]};
+sourcesIndex['hrx'] = {"name":"","dirs":[{"name":"parse","dirs":[],"files":["grammar.rs","individual.rs","mod.rs"]}],"files":["error.rs","lib.rs","repr.rs","util.rs"]};
 sourcesIndex['hrx'] = {"name":"","dirs":[{"name":"parse","dirs":[],"files":["grammar.rs","individual.rs","mod.rs"]}],"files":["error.rs","lib.rs","repr.rs"]};
 sourcesIndex['hrx'] = {"name":"","dirs":[{"name":"parse","dirs":[],"files":["grammar.rs","individual.rs","mod.rs"]}],"files":["error.rs","lib.rs","repr.rs"]};
 sourcesIndex['hrx'] = {"name":"","dirs":[{"name":"parse","dirs":[],"files":["grammar.rs","individual.rs","mod.rs"]}],"files":["error.rs","lib.rs","repr.rs"]};
