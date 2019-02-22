@@ -249,9 +249,100 @@
 <span id="249">249</span>
 <span id="250">250</span>
 <span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">parse</span>, <span class="ident">ErroneousBodyPath</span>, <span class="ident">HrxError</span>};
 <span class="kw">use</span> <span class="ident">jetscii</span>::<span class="ident">Substring</span> <span class="kw">as</span> <span class="ident">SubstringSearcher</span>;
+<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">output</span>::<span class="ident">write_archive</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">IoError</span>, <span class="ident">Write</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">boundary_str</span>;
 <span class="kw">use</span> <span class="ident">linked_hash_map</span>::<span class="ident">LinkedHashMap</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">num</span>::<span class="ident">NonZeroUsize</span>;
@@ -271,8 +362,7 @@
 <span class="doccomment">/// so instead the archive will automatically check for boundary validity when</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///   1. changing the global boundary length (via [`set_boundary_length()`](#method.set_boundary_length)) and</span>
-<span class="doccomment">///   2. serialising to an output stream</span>
-<span class="doccomment">///      (be it via the `Display` impl, [`serialise()`](#method.serialise), or any derivatives thereof)</span>
+<span class="doccomment">///   2. serialising to an output stream (usually via [`serialise()`](#method.serialise))</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// and return the path to the first erroneous (i.e. boundary-containing) `body`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
@@ -440,6 +530,94 @@
         }
 
         <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Write the archive out to the specified output stream, after verification.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The compound result type is due to the fact that `std::io::Error` doesn&#39;t play well with having it in an enum variant.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Failed validation:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use hrx::{ErroneousBodyPath, HrxArchive, HrxPath};</span>
+    <span class="doccomment">/// # use std::num::NonZeroUsize;</span>
+    <span class="doccomment">/// let mut arch = HrxArchive::new(NonZeroUsize::new(3).unwrap());</span>
+    <span class="doccomment">/// arch.comment = Some(&quot;Yeehaw! the comment\n&lt;===&gt;\n contains the boundary!&quot;.to_string());</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut out = vec![];</span>
+    <span class="doccomment">/// assert_eq!(arch.serialise(&amp;mut out).unwrap_err().unwrap(),</span>
+    <span class="doccomment">///            ErroneousBodyPath::RootComment.into());</span>
+    <span class="doccomment">/// // Note how the returned result cannot be directly compared to,</span>
+    <span class="doccomment">/// // as a byproduct of `std::io::Error` being contained therein.</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Generation:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use hrx::{ErroneousBodyPath, HrxEntryData, HrxArchive, HrxEntry, HrxPath};</span>
+    <span class="doccomment">/// # use std::num::NonZeroUsize;</span>
+    <span class="doccomment">/// let mut arch = HrxArchive::new(NonZeroUsize::new(5).unwrap());</span>
+    <span class="doccomment">/// arch.comment =</span>
+    <span class="doccomment">///     Some(&quot;This is the archive comment, forthlaying its contents&#39; description&quot;.to_string());</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// arch.entries.insert(&quot;directory&quot;.parse().unwrap(), HrxEntry {</span>
+    <span class="doccomment">///     comment: Some(&quot;This directory contains files!&quot;.to_string()),</span>
+    <span class="doccomment">///     data: HrxEntryData::Directory,</span>
+    <span class="doccomment">/// });</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// arch.entries.insert(&quot;directory/dsc.txt&quot;.parse().unwrap(), HrxEntry {</span>
+    <span class="doccomment">///     comment:</span>
+    <span class="doccomment">///         Some(&quot;This file forthlays the building blocks of any stable society&quot;.to_string()),</span>
+    <span class="doccomment">///     data: HrxEntryData::File {</span>
+    <span class="doccomment">///         body: Some(&quot;Коммунизм!\n&quot;.to_string()),</span>
+    <span class="doccomment">///     },</span>
+    <span class="doccomment">/// });</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut out = vec![];</span>
+    <span class="doccomment">/// arch.serialise(&amp;mut out).unwrap();</span>
+    <span class="doccomment">/// assert_eq!(String::from_utf8(out).unwrap(), r#&quot;&lt;=====&gt;</span>
+    <span class="doccomment">/// This directory contains files!</span>
+    <span class="doccomment">/// &lt;=====&gt; directory/</span>
+    <span class="doccomment">/// &lt;=====&gt;</span>
+    <span class="doccomment">/// This file forthlays the building blocks of any stable society</span>
+    <span class="doccomment">/// &lt;=====&gt; directory/dsc.txt</span>
+    <span class="doccomment">/// Коммунизм!</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// &lt;=====&gt;</span>
+    <span class="doccomment">/// This is the archive comment, forthlaying its contents&#39; description&quot;#);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Transserialisation:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use std::str::FromStr;</span>
+    <span class="doccomment">/// # use hrx::HrxArchive;</span>
+    <span class="doccomment">/// let arch_str = r#&quot;&lt;===&gt; input.scss</span>
+    <span class="doccomment">/// ul {</span>
+    <span class="doccomment">///   margin-left: 1em;</span>
+    <span class="doccomment">///   li {</span>
+    <span class="doccomment">///     list-style-type: none;</span>
+    <span class="doccomment">///   }</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// &lt;===&gt; output.css</span>
+    <span class="doccomment">/// ul {</span>
+    <span class="doccomment">///   margin-left: 1em;</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// ul li {</span>
+    <span class="doccomment">///   list-style-type: none;</span>
+    <span class="doccomment">/// }&quot;#;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let arch = HrxArchive::from_str(arch_str).unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut out = vec![];</span>
+    <span class="doccomment">/// arch.serialise(&amp;mut out).unwrap();</span>
+    <span class="doccomment">/// assert_eq!(String::from_utf8(out).unwrap(), arch_str);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialise</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">into</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HrxError</span>, <span class="ident">IoError</span><span class="op">&gt;&gt;</span> {
+        <span class="ident">write_archive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">into</span>)
     }
 }
 
