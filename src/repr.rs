@@ -312,9 +312,13 @@ impl FromStr for HrxArchive {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let width = parse::discover_first_boundary_length(s).ok_or(HrxError::NoBoundary)?;
-        let parsed = parse::archive(s, width)?;
+        let (comment, entries, boundary_length) = parse::archive(s, width)?;
 
-        Ok(parsed)
+        Ok(HrxArchive {
+            comment: comment,
+            entries: parse::reduce_raw_entries(entries)?,
+            boundary_length: boundary_length,
+        })
     }
 }
 
