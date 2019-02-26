@@ -7,15 +7,15 @@ use std::str::FromStr;
 
 #[test]
 fn duplicate_files() {
-    assert_eq!(HrxArchive::from_str("<======> file\n\n<======> file\n"),
+    assert_eq!(HrxArchive::from_str("<======> file\n<======> file\n"),
                Err(HrxError::DuplicateEntry("file".to_string(),
                                             HrxEntry {
                                                 comment: None,
-                                                data: HrxEntryData::File { body: Some("".to_string()) },
+                                                data: HrxEntryData::File { body: None },
                                             },
                                             HrxEntry {
                                                 comment: None,
-                                                data: HrxEntryData::File { body: Some("".to_string()) },
+                                                data: HrxEntryData::File { body: Some("".to_string()) }, // TODO: probably replace .* with .+ in parser
                                             })));
 }
 
@@ -38,10 +38,5 @@ fn duplicate_dirs() {
 #[test]
 fn file_as_parent() {
     assert_eq!(HrxArchive::from_str("<======> file\n<======> file/sub\n"), Err(HrxError::NoBoundary));
-}
-
-#[test]
-fn duplicate_despite_quotes() {
-    assert_eq!(HrxArchive::from_str("<======> file\n<======> \"file\"\n"), Err(HrxError::NoBoundary));
 }
 */

@@ -116,31 +116,31 @@ Parent directories don't have to be defined explicitly.
     assert_eq!(HrxArchive::from_str(arch_str), Ok(arch));
 }
 
-// /// This is the example/empty-file.hrx file in the original google/hrx repository.
-// #[test]
-// fn empty_file() {
-//     let arch_str = r#"<===>
-// This file is empty.
-// <===> file1
-// <===>
-// So is this one.
-// <===> file2
-// "#;
-//
-//     let mut arch = HrxArchive::new(NonZeroUsize::new(3).unwrap());
-//     arch.entries.insert("file1".parse().unwrap(),
-//                         HrxEntry {
-//                             comment: Some("This file is empty.".to_string()),
-//                             data: HrxEntryData::File { body: None },
-//                         });
-//     arch.entries.insert("file2".parse().unwrap(),
-//                         HrxEntry {
-//                             comment: Some("So is this one.".to_string()),
-//                             data: HrxEntryData::File { body: None },
-//                         });
-//
-//     assert_eq!(HrxArchive::from_str(arch_str), Ok(arch));
-// }
+/// This is the example/empty-file.hrx file in the original google/hrx repository.
+#[test]
+fn empty_file() {
+    let arch_str = r#"<===>
+This file is empty.
+<===> file1
+<===>
+So is this one.
+<===> file2
+"#;
+
+    let mut arch = HrxArchive::new(NonZeroUsize::new(3).unwrap());
+    arch.entries.insert("file1".parse().unwrap(),
+                        HrxEntry {
+                            comment: Some("This file is empty.".to_string()),
+                            data: HrxEntryData::File { body: None },
+                        });
+    arch.entries.insert("file2".parse().unwrap(),
+                        HrxEntry {
+                            comment: Some("So is this one.".to_string()),
+                            data: HrxEntryData::File { body: Some("".to_string()) },
+                        });
+
+    assert_eq!(HrxArchive::from_str(arch_str), Ok(arch));
+}
 
 /// This is the example/files-in-directories.hrx file in the original google/hrx repository.
 #[test]
