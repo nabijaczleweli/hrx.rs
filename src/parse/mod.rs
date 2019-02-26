@@ -25,8 +25,8 @@
 //! body           ::= contents newline // no newline at the end of the archive (if the
 //!                                     // archive ends in a body, all trailing
 //!                                     // newlines are part of that body's contents)
-//! contents       ::= any sequence of characters that does not include U+000A
-//!                    LINE FEED followed immediately by boundary
+//! contents       ::= any sequence of characters that neither begins with boundary nor
+//!                    includes U+000A LINE FEED followed immediately by boundary
 //!
 //! path           ::= path-component ("/" path-component)*
 //! path-component ::= path-character+ // not equal to "." or ".."
