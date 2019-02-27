@@ -15,7 +15,7 @@ fn duplicate_files() {
                                             },
                                             HrxEntry {
                                                 comment: None,
-                                                data: HrxEntryData::File { body: Some("".to_string()) }, // TODO: probably replace .* with .+ in parser
+                                                data: HrxEntryData::File { body: None },
                                             })));
 }
 

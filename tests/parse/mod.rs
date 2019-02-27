@@ -136,7 +136,7 @@ So is this one.
     arch.entries.insert("file2".parse().unwrap(),
                         HrxEntry {
                             comment: Some("So is this one.".to_string()),
-                            data: HrxEntryData::File { body: Some("".to_string()) },
+                            data: HrxEntryData::File { body: None },
                         });
 
     assert_eq!(HrxArchive::from_str(arch_str), Ok(arch));
