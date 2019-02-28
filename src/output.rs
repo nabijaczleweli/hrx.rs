@@ -41,6 +41,7 @@ fn write_archive_impl<W: Write>(ar: &HrxArchive, into: &mut W) -> Result<(), Com
 
     let bound = boundary_str(ar.boundary_length);
     let mut first_bound = true;
+    let mut ending_newline = false;
 
     for (p, e) in &ar.entries {
         write_comment(&e.comment, &bound, &mut first_bound, into)?;
@@ -49,16 +50,28 @@ fn write_archive_impl<W: Write>(ar: &HrxArchive, into: &mut W) -> Result<(), Com
         into.write_all(&[b' '])?;
         into.write_all(p.0.as_bytes())?;
         match e.data {
+            HrxEntryData::File { body: None } => {
+                ending_newline = true;
+            }
+            HrxEntryData::File { body: Some(ref body) } if body.is_empty() => {
+                ending_newline = true;
+            }
             HrxEntryData::File { body: Some(ref body) } => {
                 into.write_all(&[b'\n'])?;
                 into.write_all(body.as_bytes())?;
+
+                ending_newline = false;
             }
-            HrxEntryData::File { body: None } => {}
-            HrxEntryData::Directory => into.write_all(&[b'/'])?,
+            HrxEntryData::Directory => {
+                into.write_all(&[b'/'])?;
+                ending_newline = true;
+            }
         }
     }
 
-    write_comment(&ar.comment, &bound, &mut first_bound, into)?;
+    if !write_comment(&ar.comment, &bound, &mut first_bound, into)? && ending_newline {
+        into.write_all(&[b'\n'])?;
+    }
 
     Ok(())
 }
@@ -75,12 +88,14 @@ fn write_bound<W: Write>(bound: &str, first_bound: &mut bool, into: &mut W) -> R
     Ok(())
 }
 
-fn write_comment<W: Write>(comment: &Option<String>, bound: &str, first_bound: &mut bool, into: &mut W) -> Result<(), CompoundError> {
+fn write_comment<W: Write>(comment: &Option<String>, bound: &str, first_bound: &mut bool, into: &mut W) -> Result<bool, CompoundError> {
     if let Some(cmt) = comment.as_ref() {
         write_bound(bound, first_bound, into)?;
         into.write_all(&[b'\n'])?;
         into.write_all(cmt.as_bytes())?;
-    }
 
-    Ok(())
+        Ok(true)
+    } else {
+        Ok(false)
+    }
 }

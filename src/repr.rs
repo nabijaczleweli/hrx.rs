@@ -52,7 +52,7 @@ pub struct HrxEntry {
 pub enum HrxEntryData {
     /// File with some optional contents.
     ///
-    /// Cannot contain a newline followed by a boundary.
+    /// Cannot contain a newline followed by a boundary nor start with a boundary.
     File { body: Option<String>, },
     /// Bodyless directory.
     Directory,
