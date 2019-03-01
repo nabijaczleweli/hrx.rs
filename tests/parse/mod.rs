@@ -208,22 +208,28 @@ Inner files can also contain shorter boundaries...
     arch.entries.insert("file1.hrx".parse().unwrap(),
                         HrxEntry {
                             comment: None,
-                            data: HrxEntryData::File { body: Some("<=====> nested-file1.hrx
+                            data: HrxEntryData::File {
+                                body: Some("<=====> nested-file1.hrx
 This is a HRX file nested within a HRX file.
 
 <=====> nested-file2.hrx
 You can tell it's not part of the outer file because the boundaries are longer.
-".to_string()) },
+"
+                                    .to_string()),
+                            },
                         });
     arch.entries.insert("file2.hrx".parse().unwrap(),
                         HrxEntry {
                             comment: None,
-                            data: HrxEntryData::File { body: Some("<=> nested-file1.hrx
+                            data: HrxEntryData::File {
+                                body: Some("<=> nested-file1.hrx
 Inner files can also contain shorter boundaries...
 
 <=> nested-file2.hrx
 ...as long as they don't contain the outer file's boundary.
-".to_string()) },
+"
+                                    .to_string()),
+                            },
                         });
 
     assert_eq!(HrxArchive::from_str(arch_str), Ok(arch));
