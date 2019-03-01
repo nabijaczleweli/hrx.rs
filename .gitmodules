@@ -1,0 +1,3 @@
+[submodule "ext/hrx"]
+	path = ext/hrx
+	url = https://github.com/google/hrx.git
