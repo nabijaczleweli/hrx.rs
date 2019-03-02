@@ -414,7 +414,7 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HrxEntryData</span> {
     <span class="doccomment">/// File with some optional contents.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Cannot contain a newline followed by a boundary.</span>
+    <span class="doccomment">/// Cannot contain a newline followed by a boundary nor start with a boundary.</span>
     <span class="ident">File</span> { <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, },
     <span class="doccomment">/// Bodyless directory.</span>
     <span class="ident">Directory</span>,
