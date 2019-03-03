@@ -34,6 +34,8 @@ pub enum HrxError {
     BodyContainsBoundary(Vec<ErroneousBodyPath>),
     /// Two entries share the same path
     DuplicateEntry(String, HrxEntry, HrxEntry),
+    /// An entry attempted to use a file as a directory
+    FileAsDirectory(String, String),
 }
 
 /// A path to a `body` which contains an invalid sequence
@@ -138,6 +140,12 @@ impl fmt::Display for HrxError {
             &HrxError::DuplicateEntry(ref path, ..) => {
                 fmt.write_str("Duplicate entry: ")?;
                 fmt.write_str(&path)?;
+            }
+            &HrxError::FileAsDirectory(ref file, ref who) => {
+                fmt.write_str(&who)?;
+                fmt.write_str(" attempted to use the file at ")?;
+                fmt.write_str(&file)?;
+                fmt.write_str(" as a directrory.")?;
             }
         }
 
