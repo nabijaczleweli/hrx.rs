@@ -1,4 +1,5 @@
-use self::super::super::{HrxEntry, HrxError, HrxPath};
+use std::collections::btree_map::{BTreeMap, Entry as BTreeMapEntry};
+use self::super::super::{HrxEntryData, HrxEntry, HrxError, HrxPath};
 use linked_hash_map::LinkedHashMap;
 use std::num::NonZeroUsize;
 
@@ -99,6 +100,42 @@ fn reduce_raw_entry(k: HrxPath, v: HrxEntry, map: &mut LinkedHashMap<HrxPath, Hr
     if let Some(prev) = map.insert(k, v) {
         let (path, new) = map.pop_back().unwrap();
         return Err(HrxError::DuplicateEntry(path.into_inner(), prev, new));
+    }
+
+    Ok(())
+}
+
+
+pub fn validate_directory_tree<'e, I: Iterator<Item = (&'e HrxPath, &'e HrxEntry)>>(iter: I) -> Result<(), HrxError> {
+    let mut paths = BTreeMap::new();
+
+    for (k, v) in iter {
+        let is_dir = v.data == HrxEntryData::Directory;
+
+        println!("({}, _)", k.0);
+        for (slash_i, _) in k.0.match_indices('/') {
+            println!("{}", &k.0[0..slash_i]);
+            match paths.entry(&k.0[0..slash_i]) {
+                BTreeMapEntry::Vacant(ve) => {
+                    ve.insert(true);
+                }
+                BTreeMapEntry::Occupied(oe) => {
+                    if !oe.get() {
+                        return Err(HrxError::FileAsDirectory(oe.key().to_string(), k.0.clone()));
+                    }
+                }
+            }
+        }
+
+        match paths.entry(&k.0[..]) {
+            BTreeMapEntry::Vacant(ve) => {
+                ve.insert(is_dir);
+            }
+            BTreeMapEntry::Occupied(oe) => {
+                // dupe
+                unimplemented!();
+            }
+        }
     }
 
     Ok(())
