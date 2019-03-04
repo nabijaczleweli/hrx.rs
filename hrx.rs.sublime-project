@@ -31,6 +31,11 @@
 			"path": "tests"
 		},
 		{
+			"follow_symlinks": true,
+			"name": "External data",
+			"path": "ext"
+		},
+		{
 			"file_include_patterns":
 			[
 				"*Makefile*",

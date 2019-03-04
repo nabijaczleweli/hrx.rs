@@ -33,10 +33,8 @@ fn duplicate_dirs() {
                                             })));
 }
 
-// TODO: dir tree validation
-/*
 #[test]
 fn file_as_parent() {
-    assert_eq!(HrxArchive::from_str("<======> file\n<======> file/sub\n"), Err(HrxError::NoBoundary));
+    assert_eq!(HrxArchive::from_str("<======> file\n<======> file/sub\n"),
+               Err(HrxError::FileAsDirectory("file".to_string(), "file/sub".to_string())));
 }
-*/

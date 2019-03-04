@@ -1,6 +1,6 @@
+use hrx::{HrxEntryData, HrxArchive, HrxEntry};
 use std::fs::{self, File};
 use std::str::FromStr;
-use hrx::HrxArchive;
 use std::io::Read;
 
 
@@ -19,8 +19,6 @@ fn valid() {
     }
 }
 
-// TODO: uncomment when dir tree validation is implemented
-/*
 #[test]
 fn invalid() {
     for entry in fs::read_dir("ext/hrx/example/invalid").unwrap() {
@@ -30,9 +28,19 @@ fn invalid() {
         }
 
         let mut body = String::new();
-        File::open(path).unwrap().read_to_string(&mut body).unwrap();
+        File::open(path.clone()).unwrap().read_to_string(&mut body).unwrap();
 
-        HrxArchive::from_str(&body).unwrap_err();
+        if body.contains("This HRX file is valid, but the files it contains are not.") {
+            let arch = HrxArchive::from_str(&body).unwrap();
+
+            for (k, v) in arch.entries {
+                println!("{} -> {}", path.display(), k);
+                if let HrxEntryData::File { body: Some(internal_body) } = v.data {
+                    HrxArchive::from_str(&internal_body).unwrap_err();
+                }
+            }
+        } else {
+            HrxArchive::from_str(&body).unwrap_err();
+        }
     }
 }
-*/
