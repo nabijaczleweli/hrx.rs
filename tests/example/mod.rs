@@ -1,4 +1,4 @@
-use hrx::{HrxEntryData, HrxArchive, HrxEntry};
+use hrx::{HrxEntryData, HrxArchive};
 use std::fs::{self, File};
 use std::str::FromStr;
 use std::io::Read;

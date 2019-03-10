@@ -314,12 +314,9 @@ impl FromStr for HrxArchive {
         let width = parse::discover_first_boundary_length(s).ok_or(HrxError::NoBoundary)?;
         let (comment, entries, boundary_length) = parse::archive(s, width)?;
 
-        let entries = parse::reduce_raw_entries(entries)?;
-        parse::validate_directory_tree(entries.iter())?;
-
         Ok(HrxArchive {
             comment: comment,
-            entries: entries,
+            entries: parse::reduce_raw_entries_and_validate_directory_tree(entries)?,
             boundary_length: boundary_length,
         })
     }

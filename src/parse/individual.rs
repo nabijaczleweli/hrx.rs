@@ -31,15 +31,15 @@ fn discover_first_boundary_length_impl(in_data: &str) -> Option<NonZeroUsize> {
 }
 
 
-/// Convert a collexion of `(path, entry)` pairs into a `path -> entry` map, erroring on any duplicates.
-///
-/// Mostly the unrolled expansion of `iter.into_iter().collect()` but with checks.
+/// Convert a collexion of `(path, entry)` pairs into a `path -> entry` map, erroring on any duplicates and file-as-dir usages.
 ///
 /// # Examples
 ///
+/// Dupe:
+///
 /// ```
 /// # use hrx::{HrxEntryData, HrxEntry, HrxError, HrxPath};
-/// # use hrx::parse::reduce_raw_entries;
+/// # use hrx::parse::reduce_raw_entries_and_validate_directory_tree;
 /// # use std::num::NonZeroUsize;
 /// let mut source_material = vec![("file1.txt".parse().unwrap(),
 ///                                 HrxEntry {
@@ -57,84 +57,87 @@ fn discover_first_boundary_length_impl(in_data: &str) -> Option<NonZeroUsize> {
 ///                                 })];
 ///
 /// // The no-dupe case
-/// assert_eq!(reduce_raw_entries(source_material.clone()),
+/// assert_eq!(reduce_raw_entries_and_validate_directory_tree(source_material.clone()),
 ///            Ok(source_material.iter().cloned().collect()));
 ///
 /// // Introducing a dupe, now both files have the same paths
 /// source_material[1].0 = source_material[0].0.clone();
 ///
-/// assert_eq!(reduce_raw_entries(source_material.clone()),
-///            Err(HrxError::DuplicateEntry(source_material[0].0.to_string(),
-///                                         source_material[0].1.clone(),
-///                                         source_material[1].1.clone())));
+/// assert_eq!(reduce_raw_entries_and_validate_directory_tree(source_material.clone()),
+///            Err(HrxError::DuplicateEntry(source_material[0].0.to_string())));
 /// // i.e.
-/// assert_eq!(reduce_raw_entries(source_material.clone()),
-///            Err(HrxError::DuplicateEntry("file1.txt".to_string(),
-///                                         HrxEntry {
-///                                             comment: None,
-///                                             data: HrxEntryData::File {
-///                                                 body:
-///                                                     Some("First file's contents".to_string())
-///                                             }
-///                                         },
-///                                         HrxEntry {
-///                                             comment: None,
-///                                             data: HrxEntryData::File {
-///                                                 body:
-///                                                     Some("Second file's contents".to_string())
-///                                             }
-///                                         })));
+/// assert_eq!(reduce_raw_entries_and_validate_directory_tree(source_material.clone()),
+///            Err(HrxError::DuplicateEntry("file1.txt".to_string())));
 /// ```
-pub fn reduce_raw_entries<Ii: IntoIterator<Item = (HrxPath, HrxEntry)>>(iter: Ii) -> Result<LinkedHashMap<HrxPath, HrxEntry>, HrxError> {
+///
+/// File as directory:
+///
+/// ```
+/// # use hrx::{HrxEntryData, HrxEntry, HrxError, HrxPath};
+/// # use hrx::parse::reduce_raw_entries_and_validate_directory_tree;
+/// # use std::num::NonZeroUsize;
+/// let mut source_material = vec![("file1.txt".parse().unwrap(),
+///                                 HrxEntry {
+///                                     comment: None,
+///                                     data: HrxEntryData::File {
+///                                         body: Some("First file's contents".to_string())
+///                                     }
+///                                 }),
+///                                ("file1.txt/subfile.txt".parse().unwrap(),
+///                                 HrxEntry {
+///                                     comment: None,
+///                                     data: HrxEntryData::File {
+///                                         body: Some("Second file's contents, using the first file as directory".to_string())
+///                                     }
+///                                 })];
+///
+/// assert_eq!(reduce_raw_entries_and_validate_directory_tree(source_material.clone()),
+///            Err(HrxError::FileAsDirectory(source_material[0].0.to_string(), source_material[1].0.to_string())));
+/// // i.e.
+/// assert_eq!(reduce_raw_entries_and_validate_directory_tree(source_material.clone()),
+///            Err(HrxError::FileAsDirectory("file1.txt".to_string(), "file1.txt/subfile.txt".to_string())));
+/// ```
+pub fn reduce_raw_entries_and_validate_directory_tree<Ii: IntoIterator<Item = (HrxPath, HrxEntry)>>(iter: Ii)
+                                                                                                    -> Result<LinkedHashMap<HrxPath, HrxEntry>, HrxError> {
     let iter = iter.into_iter();
     let mut map = LinkedHashMap::with_capacity(iter.size_hint().0);
+    let mut paths = BTreeMap::new();
 
     for (k, v) in iter {
-        reduce_raw_entry(k, v, &mut map)?;
+        reduce_raw_entry_and_validate_its_directory_tree(k, v, &mut map, &mut paths)?;
     }
 
     Ok(map)
 }
 
-fn reduce_raw_entry(k: HrxPath, v: HrxEntry, map: &mut LinkedHashMap<HrxPath, HrxEntry>) -> Result<(), HrxError> {
-    if let Some(prev) = map.insert(k, v) {
-        let (path, new) = map.pop_back().unwrap();
-        return Err(HrxError::DuplicateEntry(path.into_inner(), prev, new));
-    }
-
-    Ok(())
-}
-
-
-pub fn validate_directory_tree<'e, I: Iterator<Item = (&'e HrxPath, &'e HrxEntry)>>(iter: I) -> Result<(), HrxError> {
-    let mut paths = BTreeMap::new();
-
-    for (k, v) in iter {
-        let is_dir = v.data == HrxEntryData::Directory;
-
-        println!("({}, _)", k.0);
-        for (slash_i, _) in k.0.match_indices('/') {
-            println!("{}", &k.0[0..slash_i]);
-            match paths.entry(&k.0[0..slash_i]) {
-                BTreeMapEntry::Vacant(ve) => {
-                    ve.insert(true);
-                }
-                BTreeMapEntry::Occupied(oe) => {
-                    if !oe.get() {
-                        return Err(HrxError::FileAsDirectory(oe.key().to_string(), k.0.clone()));
-                    }
+fn reduce_raw_entry_and_validate_its_directory_tree(k: HrxPath, v: HrxEntry, map: &mut LinkedHashMap<HrxPath, HrxEntry>, paths: &mut BTreeMap<String, bool>)
+                                                    -> Result<(), HrxError> {
+    println!("({}, _)", k.0);
+    for (slash_i, _) in k.0.match_indices('/') {
+        let path_prefix = &k.0[0..slash_i];
+        println!("{}", path_prefix);
+        match paths.entry(path_prefix.to_string()) {
+            BTreeMapEntry::Vacant(ve) => {
+                ve.insert(true);
+            }
+            BTreeMapEntry::Occupied(oe) => {
+                if !oe.get() {
+                    return Err(HrxError::FileAsDirectory(oe.key().to_string(), k.0.clone()));
                 }
             }
         }
+    }
 
-        match paths.entry(&k.0[..]) {
-            BTreeMapEntry::Vacant(ve) => {
-                ve.insert(is_dir);
-            }
-            BTreeMapEntry::Occupied(oe) => {
-                // dupe
-                unimplemented!();
-            }
+    match paths.entry(k.0) {
+        BTreeMapEntry::Vacant(ve) => {
+            let is_dir = v.data == HrxEntryData::Directory;
+
+            map.insert(HrxPath(ve.key().clone()), v);
+
+            ve.insert(is_dir);
+        }
+        BTreeMapEntry::Occupied(oe) => {
+            return Err(HrxError::DuplicateEntry(oe.remove_entry().0));
         }
     }
 

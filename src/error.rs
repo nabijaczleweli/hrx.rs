@@ -1,5 +1,5 @@
-use self::super::{parse, HrxEntry};
 use std::fmt::{self, Write};
+use self::super::parse;
 use std::error::Error;
 use lazysort::Sorted;
 
@@ -33,7 +33,7 @@ pub enum HrxError {
     /// Some `body`s were made to contain the archive boundary. Deserialising the archive wouldn't work as expected
     BodyContainsBoundary(Vec<ErroneousBodyPath>),
     /// Two entries share the same path
-    DuplicateEntry(String, HrxEntry, HrxEntry),
+    DuplicateEntry(String),
     /// An entry attempted to use a file as a directory
     FileAsDirectory(String, String),
 }
@@ -137,7 +137,7 @@ impl fmt::Display for HrxError {
                     fmt.write_str("No paths specified.")?;
                 }
             }
-            &HrxError::DuplicateEntry(ref path, ..) => {
+            &HrxError::DuplicateEntry(ref path) => {
                 fmt.write_str("Duplicate entry: ")?;
                 fmt.write_str(&path)?;
             }

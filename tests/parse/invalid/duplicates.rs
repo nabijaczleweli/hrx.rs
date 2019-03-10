@@ -1,36 +1,20 @@
 //! This is an adaptation of the example/invalid/duplicates.hrx file in the original google/hrx repository.
 
 
-use hrx::{HrxEntryData, HrxArchive, HrxEntry, HrxError};
+use hrx::{HrxEntryData, HrxArchive, HrxError};
 use std::str::FromStr;
 
 
 #[test]
 fn duplicate_files() {
     assert_eq!(HrxArchive::from_str("<======> file\n<======> file\n"),
-               Err(HrxError::DuplicateEntry("file".to_string(),
-                                            HrxEntry {
-                                                comment: None,
-                                                data: HrxEntryData::File { body: None },
-                                            },
-                                            HrxEntry {
-                                                comment: None,
-                                                data: HrxEntryData::File { body: None },
-                                            })));
+               Err(HrxError::DuplicateEntry("file".to_string())));
 }
 
 #[test]
 fn duplicate_dirs() {
     assert_eq!(HrxArchive::from_str("<======> dir/\n<======> dir/\n"),
-               Err(HrxError::DuplicateEntry("dir".to_string(),
-                                            HrxEntry {
-                                                comment: None,
-                                                data: HrxEntryData::Directory,
-                                            },
-                                            HrxEntry {
-                                                comment: None,
-                                                data: HrxEntryData::Directory,
-                                            })));
+               Err(HrxError::DuplicateEntry("dir".to_string())));
 }
 
 #[test]
