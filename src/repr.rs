@@ -62,6 +62,19 @@ pub enum HrxEntryData {
 ///
 /// Paths consist of `/`-separated components, each one consisting of characters higher than U+001F, except `/`, `\\` and `:`.
 /// Components cannot be `.` nor `..`.
+///
+/// # Examples
+///
+/// ```
+/// # use hrx::HrxPath;
+/// # use std::str::FromStr;
+/// let path = HrxPath::from_str("хэнло/communism.exe").unwrap();
+/// assert_eq!(path.as_ref(), "хэнло/communism.exe");
+/// assert_eq!(path.to_string(), "хэнло/communism.exe");
+///
+/// let raw = path.into_inner();
+/// assert_eq!(raw, "хэнло/communism.exe");
+/// ```
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct HrxPath(pub(crate) String);
 
@@ -324,15 +337,6 @@ impl FromStr for HrxArchive {
 
 impl HrxPath {
     /// Unwraps the contained path.
-    ///
-    /// ```
-    /// # use hrx::HrxPath;
-    /// # use std::str::FromStr;
-    /// let path = HrxPath::from_str("хэнло/communism.exe").unwrap();
-    /// let raw = path.into_inner();
-    ///
-    /// assert_eq!(raw, "хэнло/communism.exe");
-    /// ```
     pub fn into_inner(self) -> String {
         self.0
     }
@@ -356,6 +360,12 @@ impl FromStr for HrxPath {
 
 impl Borrow<str> for HrxPath {
     fn borrow(&self) -> &str {
+        &self.0
+    }
+}
+
+impl AsRef<str> for HrxPath {
+    fn as_ref(&self) -> &str {
         &self.0
     }
 }
