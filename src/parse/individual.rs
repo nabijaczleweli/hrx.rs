@@ -112,11 +112,8 @@ pub fn reduce_raw_entries_and_validate_directory_tree<Ii: IntoIterator<Item = (H
 
 fn reduce_raw_entry_and_validate_its_directory_tree(k: HrxPath, v: HrxEntry, map: &mut LinkedHashMap<HrxPath, HrxEntry>, paths: &mut BTreeMap<String, bool>)
                                                     -> Result<(), HrxError> {
-    println!("({}, _)", k.0);
     for (slash_i, _) in k.0.match_indices('/') {
-        let path_prefix = &k.0[0..slash_i];
-        println!("{}", path_prefix);
-        match paths.entry(path_prefix.to_string()) {
+        match paths.entry(k.0[0..slash_i].to_string()) {
             BTreeMapEntry::Vacant(ve) => {
                 ve.insert(true);
             }

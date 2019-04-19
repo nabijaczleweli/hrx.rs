@@ -1,7 +1,7 @@
 //! This is an adaptation of the example/invalid/duplicates.hrx file in the original google/hrx repository.
 
 
-use hrx::{HrxEntryData, HrxArchive, HrxError};
+use hrx::{HrxArchive, HrxError};
 use std::str::FromStr;
 
 
