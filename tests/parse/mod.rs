@@ -239,7 +239,7 @@ Inner files can also contain shorter boundaries...
 #[test]
 fn no_trailing_newlines() {
     let arch_str = r#"<===> file1
-This file doesn't have a trailng newline.
+This file doesn't have a trailing newline.
 <===> file2
 Neither does this one."#;
 
@@ -247,7 +247,7 @@ Neither does this one."#;
     arch.entries.insert("file1".parse().unwrap(),
                         HrxEntry {
                             comment: None,
-                            data: HrxEntryData::File { body: Some("This file doesn't have a trailng newline.".to_string()) },
+                            data: HrxEntryData::File { body: Some("This file doesn't have a trailing newline.".to_string()) },
                         });
     arch.entries.insert("file2".parse().unwrap(),
                         HrxEntry {
