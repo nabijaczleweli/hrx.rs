@@ -3,3 +3,9 @@ A Rust implementation of the [HRX plain text archive format](//github.com/google
 
 <!-- ## [Manpage](https://rawcdn.githack.com/nabijaczleweli/hrx.rs/man/hrx.1.html) -->
 ## [Documentation](https://rawcdn.githack.com/nabijaczleweli/hrx.rs/doc/hrx/index.html)
+
+## Special thanks
+
+To all who support further development on Patreon, in particular:
+
+  * ThePhD
