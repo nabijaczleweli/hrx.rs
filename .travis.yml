@@ -13,9 +13,6 @@ matrix:
     - env: LANGUAGE=Rust CLIPPY=true
       language: rust
       rust: nightly
-    - env: LANGUAGE=Ruby DEPLOY=true DEPLOY_FILE="$TRAVIS_BUILD_DIR/../hrx-man-$TRAVIS_TAG.tbz2"
-      language: ruby
-      rvm: "2.2"
     - env: LANGUAGE=Rust-doc DEPLOY=true DEPLOY_FILE="$TRAVIS_BUILD_DIR/../hrx-doc-$TRAVIS_TAG.tbz2"
       language: rust
       rust: stable
@@ -28,9 +25,6 @@ before_install:
       openssl aes-256-cbc -K $encrypted_ea8ed83849ca_key -iv $encrypted_ea8ed83849ca_iv -in gh_rsa.enc -out gh_rsa -d;
     fi
 
-install:
-  - if [ "$LANGUAGE" == "Ruby" ]; then gem install ronn; fi
-
 script:
   - if [ "$LANGUAGE" == "Rust" ]; then cargo build --verbose; fi
   - if [ "$LANGUAGE" == "Rust" ]; then cargo test --verbose; fi
@@ -40,13 +34,6 @@ script:
   - if [ "$LANGUAGE" == "Rust" ] && [ "$CLIPPY" ]; then
       rustup component add clippy-preview || cargo install --git https://github.com/rust-lang/rust-clippy clippy -f;
       cargo clippy;
-    fi
-  -
-  - if [ "$LANGUAGE" == "Ruby" ]; then
-      mkdir man; pushd man;
-      cp ../hrx.md hrx.md;
-      ronn --organization="hrx.rs developers" hrx.md;
-      popd;
     fi
 
 after_success:
@@ -63,31 +50,6 @@ after_success:
       pushd "$TRAVIS_BUILD_DIR/..";
       tar -caf "hrx-doc-$TRAVIS_TAG.tbz2" "hrx-doc-$TRAVIS_TAG";
       rm -rf "hrx-doc-$TRAVIS_TAG";
-      popd;
-    fi
-  - if [ "$LANGUAGE" == "Ruby" ] && [ "$TRAVIS_SECURE_ENV_VARS" == "true" ] && [ "$TRAVIS_COMMIT_RANGE" ] && ! [ "$TRAVIS_TAG" ]; then
-      (
-        echo "Update Rust manual for commits $TRAVIS_COMMIT_RANGE";
-        echo;
-        git log $TRAVIS_COMMIT_RANGE --pretty=oneline;
-      ) >> $TRAVIS_BUILD_DIR/../MAN_UPDATE_MSG;
-      mkdir -p ~/.ssh && cp gh_rsa ~/.ssh/id_rsa && chmod 700 ~/.ssh && chmod 600 ~/.ssh/id_rsa;
-      git clone -b man git@github.com:$TRAVIS_REPO_SLUG.git $TRAVIS_BUILD_DIR-man;
-      cp -f man/* "$TRAVIS_BUILD_DIR-man";
-      pushd "$TRAVIS_BUILD_DIR-man";
-      git config --global user.email "nabijaczleweli@gmail.com";
-      git config --global user.name "Nabijaczleweli Autouploader Bot";
-      git config --global push.default simple;
-      git add *;
-      git commit -F $TRAVIS_BUILD_DIR/../MAN_UPDATE_MSG;
-      git push;
-      popd;
-    fi
-  - if [ "$LANGUAGE" == "Ruby" ] && [ "$TRAVIS_TAG" ]; then
-      cp -r man "$TRAVIS_BUILD_DIR/../hrx-man-$TRAVIS_TAG";
-      pushd "$TRAVIS_BUILD_DIR/..";
-      tar -caf "hrx-man-$TRAVIS_TAG.tbz2" "hrx-man-$TRAVIS_TAG";
-      rm -rf "hrx-man-$TRAVIS_TAG";
       popd;
     fi
 
