@@ -8,3 +8,4 @@ A Rust implementation of the [HRX plain text archive format](//github.com/google
 To all who support further development on Patreon, in particular:
 
   * ThePhD
+  * Embark Studios
