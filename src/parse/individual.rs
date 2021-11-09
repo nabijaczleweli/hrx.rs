@@ -2,6 +2,7 @@ use std::collections::btree_map::{BTreeMap, Entry as BTreeMapEntry};
 use self::super::super::{HrxEntryData, HrxEntry, HrxError, HrxPath};
 use linked_hash_map::LinkedHashMap;
 use std::num::NonZeroUsize;
+use memchr::memchr;
 
 
 /// Search the specified for the length of the first `boundary`.
@@ -24,8 +25,8 @@ pub fn discover_first_boundary_length<S: AsRef<str>>(in_data: S) -> Option<NonZe
 }
 
 fn discover_first_boundary_length_impl(in_data: &str) -> Option<NonZeroUsize> {
-    let begin = ascii_chars!('<').find(in_data)?;
-    let length = ascii_chars!('>').find(&in_data[begin + 1..])?; // Searching from start of "====="s, so 0-based insdex of ">" will be their length
+    let begin = memchr(b'<', in_data.as_bytes())?;
+    let length = memchr(b'>', in_data[begin + 1..].as_bytes())?; // Searching from start of "====="s, so 0-based index of ">" will be their length
 
     NonZeroUsize::new(length)
 }

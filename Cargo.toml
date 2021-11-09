@@ -15,7 +15,7 @@ authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
 [dependencies]
 linked-hash-map = "0.5"
 lazysort = "0.2"
-jetscii = "0.4"
+memchr = "=2.3.4"
 
 [build-dependencies]
 rustfmt = "0.10"

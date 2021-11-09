@@ -81,8 +81,7 @@
 
 extern crate linked_hash_map;
 extern crate lazysort;
-#[macro_use]
-extern crate jetscii;
+extern crate memchr;
 
 pub mod util;
 pub mod parse;

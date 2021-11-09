@@ -1,5 +1,4 @@
 use self::super::{parse, ErroneousBodyPath, HrxError};
-use jetscii::Substring as SubstringSearcher;
 use self::super::output::write_archive;
 use std::io::{Error as IoError, Write};
 use self::super::util::boundary_str;
@@ -199,16 +198,15 @@ impl HrxArchive {
 
     fn validate_boundlen(&self, len: NonZeroUsize) -> Result<(), HrxError> {
         let bound = boundary_str(len);
-        let ss = SubstringSearcher::new(&bound);
 
         let mut paths = vec![];
 
-        let _ = verify_opt(&self.comment, &ss).map_err(|_| paths.push(ErroneousBodyPath::RootComment));
+        let _ = verify_opt(&self.comment, &bound).map_err(|_| paths.push(ErroneousBodyPath::RootComment));
         for (pp, dt) in &self.entries {
-            let _ = verify_opt(&dt.comment, &ss).map_err(|_| paths.push(ErroneousBodyPath::EntryComment(pp.to_string())));
+            let _ = verify_opt(&dt.comment, &bound).map_err(|_| paths.push(ErroneousBodyPath::EntryComment(pp.to_string())));
             match dt.data {
                 HrxEntryData::File { ref body } => {
-                    let _ = verify_opt(&body, &ss).map_err(|_| paths.push(ErroneousBodyPath::EntryData(pp.to_string())));
+                    let _ = verify_opt(&body, &bound).map_err(|_| paths.push(ErroneousBodyPath::EntryData(pp.to_string())));
                 }
                 HrxEntryData::Directory => {}
             }
@@ -310,9 +308,9 @@ impl HrxArchive {
     }
 }
 
-fn verify_opt(which: &Option<String>, with: &SubstringSearcher) -> Result<(), ()> {
+fn verify_opt(which: &Option<String>, with: &str) -> Result<(), ()> {
     if let Some(dt) = which.as_ref() {
-        if with.find(dt).is_some() {
+        if dt.find(with).is_some() {
             return Err(());
         }
     }
