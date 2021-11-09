@@ -10,9 +10,6 @@ matrix:
     - env: LANGUAGE=Rust
       language: rust
       rust: beta
-    - env: LANGUAGE=Rust CLIPPY=true
-      language: rust
-      rust: nightly
     - env: LANGUAGE=Rust DEPLOY=false
       language: rust
       rust: 1.35.0
@@ -34,10 +31,6 @@ script:
   - if [ "$LANGUAGE" == "Rust" ] && [ "$DEPLOY" ] && [ "$TRAVIS_TAG" ]; then cargo build --verbose --release; fi
   -
   - if [ "$LANGUAGE" == "Rust-doc" ]; then cargo doc; fi
-  - if [ "$LANGUAGE" == "Rust" ] && [ "$CLIPPY" ]; then
-      rustup component add clippy-preview || cargo install --git https://github.com/rust-lang/rust-clippy clippy -f;
-      cargo clippy;
-    fi
 
 after_success:
   - if [ "$LANGUAGE" == "Rust" ] && [ "$DEPLOY" ] && [ "$TRAVIS_TAG" ]; then
