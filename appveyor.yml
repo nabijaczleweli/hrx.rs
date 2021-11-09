@@ -1,4 +1,4 @@
-version: 0.1.0-{build}
+version: 0.1.1-{build}
 skip_tags: false
 
 platform: x64
@@ -30,23 +30,10 @@ build: off
 build_script:
   - git submodule update --init --recursive
   - cargo build --verbose --release
-#  - cp target\release\hrx.exe hrx-v0.1.0.exe
-#  - strip --strip-all --remove-section=.comment --remove-section=.note hrx-v0.1.0.exe
 
 test: off
 test_script:
   - cargo test --verbose --release
-
-#artifacts:
-#  - path: hrx-v0.1.0.exe
-
-#deploy:
-#  provider: GitHub
-#  artifact: hrx-v0.1.0.exe
-#  auth_token:
-#    secure: /VEQCm5hyMlBWeZO3+TJ0pdw/0L9jB1Lg+JYEhqVQ4pCVpK352EsXw5rM8DBnk2M
-#  on:
-#    appveyor_repo_tag: true
 
 notifications:
   - provider: Email
