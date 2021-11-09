@@ -13,6 +13,9 @@ matrix:
     - env: LANGUAGE=Rust CLIPPY=true
       language: rust
       rust: nightly
+    - env: LANGUAGE=Rust DEPLOY=false
+      language: rust
+      rust: 1.35.0
     - env: LANGUAGE=Rust-doc DEPLOY=true DEPLOY_FILE="$TRAVIS_BUILD_DIR/../hrx-doc-$TRAVIS_TAG.tbz2"
       language: rust
       rust: stable
@@ -56,7 +59,7 @@ after_success:
 deploy:
   provider: releases
   api_key:
-    secure: "yMyDldXIIB7/4UfQPBSwYThzK74UuuizfXaQ2c4DSHWj/x6KlFuaATO8JYuJ6XflNwmyv7H18FlLsVik/MoHxj14Fu+cJJfxP19NKFdMzib8NBfshfJlIhUfeLah7HPV4Lvy9Y88vrUBwLTCFod1q4pE0V0tALINf+N5iD5+dnHXlg9T/joJ3CYyCYDwC0FHAinCKmzM1ZAM1bWr866FAoX6d+lsHgHLtVn3KeYfDqVTTqRMkrcUbTnknv1lL/5Zie+yEZrhFPj3hctD7sZ4aIEwbKpCQBNNrVlPq8qIzrPSeM/92o3vjSKCW1IwfWk3zBRLZgoXEbGoJ5JTAAQCMCLgdYgLYehF1CAJb5x1+SkS5FpU1BqUxRPEoRicGH5+lPBgYhnwzHpoPUj9dnXykt05O2RvJlgKeyrrbe8DOtRr21p0xNdN+UBhf/rcQGCwl8dZkbiQVQ5PlGDmjReCCJSMzsA6LZJdAvUnY/xSWZP119rFR8tcdTuxEhSuU6i1a/NkIU/gPNgqSFHLCDqpFS1HB8nmQTz/PCD7Nty/2tTwwdAyLKcgNxEeR9XcPSKgm0YjJFt8HeSQdwFaQ1CPp/1yUJjkblXFzcuXjxECdELhBFZ5sJ0Ma1fbRJjIQGc+s7NmofNqwUqVeu3mvaRYZbjtkUd+cE3x6BRgOXXdTBY="
+    secure: "mkkG3hr79UYiUCp5uxHgnFFqmQtGyMR/Irr0iFEli28RfHE4fGeXkLELvgaNouito0RT+hhPaqdFfGmaFEWZxTJvSUqGTqHuMREBKxTxYgLEYmRouX6aubLpmssuc8fC6iwUQbXsNJK/QB3gZqSG1MZZ8A5gsvCh2MfCDg8F5BsknFi5LXfqP6gwmUdGOJIYnx6h6jERQ/bSCqYEjjLp5vCMZhTDG+5kVWHhIdcEWOevUZT2we8PeVBMVyymtpMsqvZxGwPDrZF7RUGKtxbxkhPGlKg32q9Qp+d/Hi7jqL8S/3p+02ri+BLHPMVa9nUpfdcarjfcKStlSlFZQrp5FuyLeBZd7t6P8eFYDbhPo04ZJ4f4Rf46FucO8TK26EkWqZkLfJ02xZy2nrG+ZyY5fAChvazrMFKGw8meFduAIbF4atTScebXQY+sWeU2oswDbNEEcJZMeaPsrxlhYXTXSUUGLQ33ezgXaTcg7ERNMIo3r4bB1ZO6dPsWrE2H/F/eLF28yWnow3QjvxVzImPGzTvqJl8xGOhAuZM8S5HtXw6xFD1uMtGpsSQK8a0lSJQwMfhPsjXflFqFnvmlaiU4BnjRDdhB1FfpKqt15H68vi/+ugZOeXrPfqgWHA8yqkqwtKNnfe969Pj1/OyG50GaBllM3oMXOh9QZvZxFVJHTTI="
   file: "$DEPLOY_FILE"
   skip_cleanup: true
   on:

@@ -77,6 +77,7 @@
 //!
 //!   * ThePhD
 //!   * Embark Studios
+//!   * Jasper Bekkers
 
 
 extern crate linked_hash_map;
