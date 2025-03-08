@@ -25,7 +25,7 @@ use std::error::Error;
 ///     }
 ///     _ => unreachable!(),
 /// }
-/// assert_eq!(err.to_string(), r#"Parse failed at 1:7 [position 6]: expected " ", or "\n"."#);
+/// assert_eq!(err.to_string(), r#"Parse failed at 1:7 [position 6]: expected one of " ", "\n"."#);
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum HrxError {
@@ -75,28 +75,7 @@ impl fmt::Display for HrxError {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         match self {
             &HrxError::NoBoundary => fmt.write_str("No boundary found")?,
-            &HrxError::Parse(ref pe) => {
-                write!(fmt, "Parse failed at {}:{} [position {}]: expected ", pe.line, pe.column, pe.offset)?;
-
-                let sorted: Vec<_> = pe.expected.tokens().collect();
-                for (i, x) in sorted.iter().enumerate() {
-                    if i != 0 {
-                        fmt.write_str(", ")?;
-
-                        if i == sorted.len() - 1 {
-                            fmt.write_str("or ")?;
-                        }
-                    }
-
-                    if x.len() == 1 {
-                        write!(fmt, "{:?}", x)?;
-                    } else {
-                        fmt.write_str(x)?;
-                    }
-                }
-
-                fmt.write_str(".")?;
-            }
+            &HrxError::Parse(ref pe) => write!(fmt, "Parse failed at {}:{} [position {}]: expected {}.", pe.line, pe.column, pe.offset, pe.expected)?,
             &HrxError::BodyContainsBoundary(ref paths) => {
                 fn first_char(fmt: &mut fmt::Formatter, c: char, first: bool, last: bool) -> fmt::Result {
                     if first {
