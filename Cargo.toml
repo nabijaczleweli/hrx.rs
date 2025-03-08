@@ -8,7 +8,7 @@ keywords = ["archive", "plaintext"]
 categories = ["command-line-utilities", "encoding"]
 license = "MIT"
 # Remember to also update in appveyor.yml
-version = "0.1.1"
+version = "1.0.0"
 authors = ["наб <nabijaczleweli@nabijaczleweli.xyz>"]
 
 
