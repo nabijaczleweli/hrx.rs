@@ -100,7 +100,7 @@ rule path_component() -> &'input str
 
 /// Any character other than U+0000 through U+001F, U+007F DELETE, U+002F SOLIDUS, U+003A COLON, or U+005C REVERSE SOLIDUS
 rule path_character() -> char
-    = quiet!{c:$(!['\x00'..='\x1F' | '\x7F' | '/' | ':' | '\\'][_]) { c.chars().next().unwrap() }}
+    = quiet!{c:$([^'\x00'..='\x1F' | '\x7F' | '/' | ':' | '\\']) { c.chars().next().unwrap() }}
     / expected!("Any character other than U+0000 through U+001F, U+007F DELETE, U+002F SOLIDUS, U+003A COLON, or U+005C REVERSE SOLIDUS")
 
 }}

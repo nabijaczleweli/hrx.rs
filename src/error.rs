@@ -21,8 +21,7 @@ use std::error::Error;
 ///         assert_eq!(pe.line, 1);
 ///         assert_eq!(pe.column, 7);
 ///         assert_eq!(pe.offset, 6);
-///         assert_eq!(pe.expected.tokens().collect::<BTreeSet<_>>(),
-///                    vec!["\" \"", "\"\\n\""].into_iter().collect());
+///         assert_eq!(pe.expected.tokens().collect::<Vec<_>>(), vec!["\" \"", "\"\\n\""]);
 ///     }
 ///     _ => unreachable!(),
 /// }
@@ -79,8 +78,7 @@ impl fmt::Display for HrxError {
             &HrxError::Parse(ref pe) => {
                 write!(fmt, "Parse failed at {}:{} [position {}]: expected ", pe.line, pe.column, pe.offset)?;
 
-                let mut sorted: Vec<_> = pe.expected.tokens().collect();
-                sorted.sort();
+                let sorted: Vec<_> = pe.expected.tokens().collect();
                 for (i, x) in sorted.iter().enumerate() {
                     if i != 0 {
                         fmt.write_str(", ")?;
