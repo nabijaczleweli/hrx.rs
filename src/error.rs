@@ -1,7 +1,6 @@
 use std::fmt::{self, Write};
 use self::super::parse;
 use std::error::Error;
-use lazysort::Sorted;
 
 
 /// Generic error type, encompassing more precise errors.
@@ -10,19 +9,24 @@ use lazysort::Sorted;
 ///
 /// ```
 /// # use hrx::{HrxArchive, HrxError};
+/// # use std::collections::BTreeSet;
 /// # use hrx::parse::ParseError;
 /// # use std::str::FromStr;
 /// assert_eq!(HrxArchive::from_str("Not an actual archive, missing a boundary"),
 ///            Err(HrxError::NoBoundary));
 ///
 /// let err = HrxArchive::from_str("<====>no space before").unwrap_err();
-/// assert_eq!(err, HrxError::Parse(ParseError {
-///     line: 1,
-///     column: 7,
-///     offset: 6,
-///     expected: vec![" ", "\n"].into_iter().collect(),
-/// }));
-/// assert_eq!(err.to_string(), r#"Parse failed at 1:7 [position 6]: expected "\n", or " "."#);
+/// match err {
+///     HrxError::Parse(ref pe) => {
+///         assert_eq!(pe.line, 1);
+///         assert_eq!(pe.column, 7);
+///         assert_eq!(pe.offset, 6);
+///         assert_eq!(pe.expected.tokens().collect::<BTreeSet<_>>(),
+///                    vec!["\" \"", "\"\\n\""].into_iter().collect());
+///     }
+///     _ => unreachable!(),
+/// }
+/// assert_eq!(err.to_string(), r#"Parse failed at 1:7 [position 6]: expected " ", or "\n"."#);
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum HrxError {
@@ -75,11 +79,13 @@ impl fmt::Display for HrxError {
             &HrxError::Parse(ref pe) => {
                 write!(fmt, "Parse failed at {}:{} [position {}]: expected ", pe.line, pe.column, pe.offset)?;
 
-                for (i, x) in pe.expected.iter().sorted().enumerate() {
+                let mut sorted: Vec<_> = pe.expected.tokens().collect();
+                sorted.sort();
+                for (i, x) in sorted.iter().enumerate() {
                     if i != 0 {
                         fmt.write_str(", ")?;
 
-                        if i == pe.expected.len() - 1 {
+                        if i == sorted.len() - 1 {
                             fmt.write_str("or ")?;
                         }
                     }

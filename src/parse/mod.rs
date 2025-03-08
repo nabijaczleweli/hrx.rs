@@ -38,5 +38,65 @@
 mod individual;
 mod grammar;
 
-pub use self::grammar::{ParseResult, ParseError, directory, archive, comment, entry, body, file, path};
+pub use self::grammar::{directory, archive, comment, entry, body, file, path};
 pub use self::individual::{reduce_raw_entries_and_validate_directory_tree, discover_first_boundary_length};
+
+/// HRX parsing error
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ParseError {
+    /// 1-based line # of error
+    pub line: usize,
+    /// 1-based column # of error
+    pub column: usize,
+    /// Byte offset of error
+    pub offset: usize,
+    /// Expected but unmatched rules
+    pub expected: peg::error::ExpectedSet,
+}
+
+
+impl From<peg::error::ParseError<peg::str::LineCol>> for ParseError {
+    fn from(err: peg::error::ParseError<peg::str::LineCol>) -> Self {
+        ParseError {
+            line: err.location.line,
+            column: err.location.column,
+            offset: err.location.offset,
+            expected: err.expected,
+        }
+    }
+}
+impl Into<peg::error::ParseError<peg::str::LineCol>> for ParseError {
+    fn into(self) -> peg::error::ParseError<peg::str::LineCol> {
+        peg::error::ParseError {
+            location: peg::str::LineCol {
+                line: self.line,
+                column: self.column,
+                offset: self.offset,
+            },
+            expected: self.expected,
+        }
+    }
+}
+
+/// Copied from `peg::error::ParseError`
+impl std::fmt::Display for ParseError {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
+        write!(fmt,
+               "error at {}: expected {}",
+               peg::str::LineCol {
+                   line: self.line,
+                   column: self.column,
+                   offset: self.offset,
+               },
+               self.expected)
+    }
+}
+impl std::error::Error for ParseError {
+    fn description(&self) -> &str {
+        "parse error"
+    }
+}
+
+
+/// Convenience result type
+pub type ParseResult<T> = Result<T, ParseError>;

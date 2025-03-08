@@ -81,8 +81,8 @@
 
 
 extern crate linked_hash_map;
-extern crate lazysort;
 extern crate memchr;
+extern crate peg;
 
 pub mod util;
 pub mod parse;

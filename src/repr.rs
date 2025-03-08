@@ -323,7 +323,7 @@ impl FromStr for HrxArchive {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let width = parse::discover_first_boundary_length(s).ok_or(HrxError::NoBoundary)?;
-        let (comment, entries, boundary_length) = parse::archive(s, width)?;
+        let (comment, entries, boundary_length) = parse::archive(s, width).map_err(parse::ParseError::from)?;
 
         Ok(HrxArchive {
             comment: comment,
@@ -350,7 +350,7 @@ impl FromStr for HrxPath {
     type Err = HrxError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let parsed = parse::path(s, NonZeroUsize::new(1).unwrap())?;
+        let parsed = parse::path(s, NonZeroUsize::new(1).unwrap()).map_err(parse::ParseError::from)?;
 
         Ok(parsed)
     }
