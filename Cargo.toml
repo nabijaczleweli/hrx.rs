@@ -14,5 +14,5 @@ authors = ["наб <nabijaczleweli@nabijaczleweli.xyz>"]
 
 [dependencies]
 linked-hash-map = "0.5"
-memchr = "=2.3.4"
+memchr = "2.7"
 peg = "0.8"
